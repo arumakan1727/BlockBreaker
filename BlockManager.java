@@ -11,12 +11,16 @@ import java.util.List;
 public class BlockManager
 {
     public static final int NUM_BLOCK_COLOR = 4;
-    private final BufferedImage img_blocks[] = new BufferedImage[NUM_BLOCK_COLOR];
-    private final List<Block> blocks;
 
-    public BlockManager(BufferedImage src)
+    private final static BufferedImage img_blocks[] = new BufferedImage[NUM_BLOCK_COLOR];
+    private final List<Block> blocks;
+    private GameState gameState;
+
+    public BlockManager(BufferedImage src, GameState state)
     {
         this.blocks = new ArrayList<>();
+        this.gameState = state;
+
         for (int i = 0; i < NUM_BLOCK_COLOR; i++) {
             img_blocks[i] = ImageUtil.imageCopy(src);
         }

@@ -3,11 +3,14 @@ package myGame;
 import ydk.game.sprite.Sprite;
 
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 public class Ball extends Sprite
 {
     public static final int SIZE = 20;
+    private static final double SPEED_FLY = 5;
+    private static final double SPEED_ARRANGEMENT = 3;
 
     private final BufferedImage img;
     private double vx, vy;  //speed
@@ -15,8 +18,34 @@ public class Ball extends Sprite
 
     public Ball(final BufferedImage img)
     {
-        this.img = img;
+        this(img, 0, 0);
     }
+
+    public Ball(final BufferedImage img, Point p)
+    {
+        this(img, p.x, p.y);
+    }
+
+    public Ball(final BufferedImage img, int x, int y)
+    {
+        this.img = img;
+        this.x = x;
+        this.y = y;
+        this.delay = 0;
+        this.landed = true;
+    }
+
+    public boolean isLanded()
+    {
+        return landed;
+    }
+
+    public void setLanded(boolean landed)
+    {
+        this.landed = landed;
+    }
+
+    private boolean landed;
 
     public RectBounds getBounds()
     {
@@ -65,6 +94,26 @@ public class Ball extends Sprite
         return RectBounds.Location.NIL;
     }
 
+    public void setVx(double vx)
+    {
+        this.vx = vx;
+    }
+
+    public void setVy(double vy)
+    {
+        this.vy = vy;
+    }
+
+    public double getVx()
+    {
+        return vx;
+    }
+
+    public double getVy()
+    {
+        return vy;
+    }
+
     public int getDelay() {
         return this.delay;
     }
@@ -73,12 +122,14 @@ public class Ball extends Sprite
     }
 
     @Override
-    public void update()
+    public void update(double eta)
     {
         if (this.delay > 0) {
             this.delay--;
             return ;
         }
+        if (landed)
+            return;
 
         x += vx;
         y += vy;
@@ -86,8 +137,13 @@ public class Ball extends Sprite
         if ((x < 0) || (x+SIZE > Game.WIDTH)) {
             vx = -vx;
         }
-        if ((y < 0) || (y+SIZE > Game.HEIGHT)) {
+        if (y < 0) {
             vy = -vy;
+        }
+
+        //地面についたらフラグを立てる
+        if (y+SIZE > Game.HEIGHT) {
+            this.landed = true;
         }
 
     }

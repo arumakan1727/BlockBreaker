@@ -23,7 +23,7 @@ public class Block extends Sprite
         return (new RectBounds(x, y, x+WIDTH, y+HEIGHT));
     }
     @Override
-    public void update()
+    public void update(double eta)
     {
 
     }
