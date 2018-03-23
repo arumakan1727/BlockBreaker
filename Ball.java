@@ -9,8 +9,8 @@ import java.awt.image.BufferedImage;
 public class Ball extends Sprite
 {
     public static final int SIZE = 20;
-    private static final double SPEED_FLY = 5;
-    private static final double SPEED_ARRANGEMENT = 3;
+    public static final double SPEED_FLY = 5;
+    public static final double SPEED_ARRANGEMENT = 3;
 
     private final BufferedImage img;
     private double vx, vy;  //speed
@@ -128,22 +128,26 @@ public class Ball extends Sprite
             this.delay--;
             return ;
         }
-        if (landed)
-            return;
+//        if (landed)
+//            return;
 
         x += vx;
         y += vy;
-        // 画面の縁に触れたなら向きを反転
-        if ((x < 0) || (x+SIZE > Game.WIDTH)) {
-            vx = -vx;
-        }
-        if (y < 0) {
-            vy = -vy;
-        }
 
-        //地面についたらフラグを立てる
-        if (y+SIZE > Game.HEIGHT) {
-            this.landed = true;
+        // 飛んでいる場合はhogehoge処理
+        if (!landed) {
+            // 画面の縁に触れたなら向きを反転
+            if ((x < 0) || (x + SIZE > Game.WIDTH)) {
+                vx = -vx;
+            }
+            if (y < 0) {
+                vy = -vy;
+            }
+
+            //地面についたらフラグを立てる
+            if (y + SIZE > Game.HEIGHT) {
+                this.landed = true;
+            }
         }
 
     }

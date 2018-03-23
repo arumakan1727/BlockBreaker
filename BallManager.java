@@ -7,9 +7,8 @@ import java.util.List;
 
 public class BallManager
 {
-    public static final int SIZE = 20;
     public static final Point DEFAULT_START_POS
-            = new Point(Game.WIDTH / 2, Game.HEIGHT - SIZE);    //ボールの左上の座標
+            = new Point(Game.WIDTH / 2, Game.HEIGHT - Ball.SIZE);    //ボールの左上の座標
 
     private static BufferedImage img_ball;
 
@@ -58,10 +57,25 @@ public class BallManager
 
     private void prepareLaunch() //発射準備
     {
+        /*マウスに向けて飛ぶように速度(向き)を算出 */
+        //ボールの左上の座標
+        final double nextX = gameState.mousePos.x - Ball.SIZE;
+        final double nextY = gameState.mousePos.y - Ball.SIZE;
+
+        // 角度計算
+        final double rad = Math.atan2(nextY - preLaunchPos.y,
+                nextX - preLaunchPos.x);
+        System.out.println("Degree: " + Math.toDegrees(rad));
+
+        final double vx = Ball.SPEED_FLY * Math.cos(rad); // x 方向の速度
+        final double vy = Ball.SPEED_FLY * Math.sin(rad);
+
         for (int i = 0; i < balls.size(); i++) {
             Ball b = balls.get(i);
             b.setDelay(i * 20);
             b.setLanded(false);
+            b.setVx(vx); //速度設定
+            b.setVy(vy);
         }
     }
 
@@ -71,6 +85,7 @@ public class BallManager
         Ball b = balls.get(0);
         if (b.isLanded())
         {
+            // 以降のボールの着地した後の定位置
             preLaunchPos.x = (int)b.getX();
             preLaunchPos.y = (int)b.getY();
         }
@@ -80,10 +95,19 @@ public class BallManager
         {
             if (v.isLanded()) //地面についているとき
             {
+                v.setVy(0); //地面に付いているので上下運動なし
+
                 if ((int) v.getX() == preLaunchPos.x && (int) v.getY() == preLaunchPos.y) {
-                    continue;
+                    // 止める
+                    v.setVx(0);
+                } else {
+                    // TODO: 発射場所へ水平移動
+                    if ((int)v.getX() < preLaunchPos.x) { //定位置よりも左にある
+                        v.setVx(Ball.SPEED_ARRANGEMENT);
+                    } else {
+                        v.setVx(-(Ball.SPEED_ARRANGEMENT));
+                    }
                 }
-                // TODO: 発射場所へ水平移動
             }
             else    //まだ飛んでいる時
             {
