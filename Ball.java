@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 public class Ball extends Sprite
 {
     public static final int SIZE = 20;
-    public static final double SPEED_FLY = 3;
+    public static final double SPEED_FLY = 5;
     public static final double SPEED_ARRANGEMENT = 5;
 
     private final BufferedImage img;
@@ -81,16 +81,16 @@ public class Ball extends Sprite
             return RectBounds.Location.RIGHT;
         }
         else if (leftTop) {  // 左上
-            return RectBounds.Location.L_TOP;
+            return RectBounds.Location.LEFT_TOP;
         }
         else if (rightTop) { // 右上
-            return RectBounds.Location.R_TOP;
+            return RectBounds.Location.RIGHT_TOP;
         }
         else if (leftBtm) {  // 左下
-            return RectBounds.Location.L_BOTTOM;
+            return RectBounds.Location.LEFT_BOTTOM;
         }
         else if (rightBtm) { // 右下
-            return RectBounds.Location.R_BOTTOM;
+            return RectBounds.Location.RIGHT_BOTTOM;
         }
         else
             return RectBounds.Location.NIL;

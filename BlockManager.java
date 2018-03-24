@@ -13,10 +13,11 @@ import java.util.Random;
 public class BlockManager
 {
     public static final int NUM_BLOCK_COLOR = 4;
-    public static final int MARGIN_X = 3;
-    public static final int MARGIN_Y = 3;
+    public static final int MARGIN_X = 5;
+    public static final int MARGIN_Y = 5;
     public static final int OFFSET_X = 40;
     public static final int OFFSET_Y = 10;
+    public static final int DEFAULT_HP = 10;
     private static final int NUM_BLOCK_HORIZONTAL = 6;
     private static final int NUM_BLOCK_VERTICAL = 5;
 
@@ -79,7 +80,7 @@ public class BlockManager
         for (int i=0; i<NUM_BLOCK_HORIZONTAL; ++i) {
             if (!is_void[i]) {
                 int x = OFFSET_X + i * (Block.WIDTH + MARGIN_X);
-                list.add(new Block(img_blocks[rand.nextInt(NUM_BLOCK_COLOR)], x, y, 8));
+                list.add(new Block(img_blocks[rand.nextInt(NUM_BLOCK_COLOR)], x, y, DEFAULT_HP));
             }
         }
 

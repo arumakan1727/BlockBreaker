@@ -113,7 +113,6 @@ public class Game implements GameProcess
             }
         });
 
-        /*
         this.screen.addKeyListener(new KeyAdapter()
         {
             @Override
@@ -121,7 +120,6 @@ public class Game implements GameProcess
             {
                 switch (ev.getKeyCode()) {
                     case KeyEvent.VK_SPACE:
-                        System.out.println("spaceKey pressed");
                         gameState.keyPressed_space = true;
                         break;
                 }
@@ -132,13 +130,11 @@ public class Game implements GameProcess
             {
                 switch (ev.getKeyCode()) {
                     case KeyEvent.VK_SPACE:
-                        System.out.println("spaceKey released");
                         gameState.keyPressed_space = false;
                         break;
                 }
             }
         });
-        */
     }
 
 }

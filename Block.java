@@ -23,7 +23,7 @@ public class Block extends Sprite
 
     public RectBounds getBounds()
     {
-        return (new RectBounds(x-2, y-2, x+WIDTH+2, y+HEIGHT+2));
+        return (new RectBounds(x, y, x+WIDTH, y+HEIGHT));
     }
 
     public void addDamage()
