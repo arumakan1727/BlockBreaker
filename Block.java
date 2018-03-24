@@ -7,20 +7,23 @@ import java.awt.image.BufferedImage;
 
 public class Block extends Sprite
 {
-    public final int WIDTH, HEIGHT;
+    public static final int WIDTH = 70;
+    public static final int HEIGHT = 36;
+
     private int life;
     private final BufferedImage img;
 
-    public Block(final BufferedImage img)
+    public Block(final BufferedImage img, int x, int y, int life)
     {
         this.img = img;
-        this.WIDTH = img.getWidth();
-        this.HEIGHT = img.getHeight();
+        this.x = x;
+        this.y = y;
+        this.life = life;
     }
 
     public RectBounds getBounds()
     {
-        return (new RectBounds(x, y, x+WIDTH, y+HEIGHT));
+        return (new RectBounds(x-2, y-2, x+WIDTH+2, y+HEIGHT+2));
     }
 
     public void addDamage()
@@ -46,6 +49,6 @@ public class Block extends Sprite
     @Override
     public void draw(Graphics2D g2d)
     {
-
+        g2d.drawImage(img, (int)x, (int)y, null);
     }
 }

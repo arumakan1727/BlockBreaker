@@ -20,7 +20,7 @@ import java.io.IOException;
 public class Game implements GameProcess
 {
     public static final int WIDTH   = 720;
-    public static final int HEIGHT  = 720;
+    public static final int HEIGHT  = 540;
     public static final int FLOOR_Y = HEIGHT - 30;
     public static BufferedImage img_ball, img_block, img_hexagonBack, img_floor;
 
@@ -47,8 +47,8 @@ public class Game implements GameProcess
     {
         this.gameState = GameState.CLICK_WAIT;
         this.screen = (Component) renderer;
-        this.blockManager = new BlockManager(img_block, this.gameState);
-        this.ballManager = new BallManager(img_ball, blockManager.getBlocks(), this.gameState);
+        this.blockManager = new BlockManager(img_block);
+        this.ballManager = new BallManager(img_ball, blockManager.getBlocks());
 
         this.eventListenInit(this.screen);
 
@@ -80,13 +80,6 @@ public class Game implements GameProcess
     public void render(Graphics2D g2d)
     {
         g2d.drawImage(img_hexagonBack, 0, 0,null);
-        for (int i = 0; i < 5; ++i) {
-            for (int j = 0; j < 5; ++j) {
-                int y = 20 + i * (img_block.getHeight() + 5);
-                int x = 30 + j * (img_block.getWidth() + 5);
-                g2d.drawImage(img_block, x, y, null);
-            }
-        }
         blockManager.draw(g2d);
         ballManager.draw(g2d);
 

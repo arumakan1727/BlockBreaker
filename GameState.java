@@ -17,6 +17,6 @@ public enum GameState
     @Override
     public String toString()
     {
-        return super.toString() + mousePos.toString();
+        return super.toString() + " / " + mousePos.toString();
     }
 }

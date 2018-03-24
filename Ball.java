@@ -9,12 +9,13 @@ import java.awt.image.BufferedImage;
 public class Ball extends Sprite
 {
     public static final int SIZE = 20;
-    public static final double SPEED_FLY = 8;
+    public static final double SPEED_FLY = 3;
     public static final double SPEED_ARRANGEMENT = 5;
 
     private final BufferedImage img;
     private double vx, vy;  //speed
     private int delay;
+    private boolean isPrepareLaunchPos;
 
     public Ball(final BufferedImage img)
     {
@@ -115,6 +116,16 @@ public class Ball extends Sprite
         return vy;
     }
 
+    public void invertVx()
+    {
+        vx = -vx;
+    }
+
+    public void invertVy()
+    {
+        vy = -vy;
+    }
+
     public int getDelay() {
         return this.delay;
     }
@@ -155,5 +166,15 @@ public class Ball extends Sprite
     public void draw(Graphics2D g2d)
     {
         g2d.drawImage(img, (int)x, (int)y, null);
+    }
+
+    public boolean isPrepareLaunchPos()
+    {
+        return isPrepareLaunchPos;
+    }
+
+    public void setisPrepareLaunchPos(boolean prepareLaunchPos)
+    {
+        isPrepareLaunchPos = prepareLaunchPos;
     }
 }
