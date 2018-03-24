@@ -9,8 +9,8 @@ import java.awt.image.BufferedImage;
 public class Ball extends Sprite
 {
     public static final int SIZE = 20;
-    public static final double SPEED_FLY = 5;
-    public static final double SPEED_ARRANGEMENT = 3;
+    public static final double SPEED_FLY = 8;
+    public static final double SPEED_ARRANGEMENT = 5;
 
     private final BufferedImage img;
     private double vx, vy;  //speed
@@ -70,28 +70,29 @@ public class Ball extends Sprite
         if (leftTop && rightTop) {  // 左上と右上がブロック内
             return RectBounds.Location.TOP;
         }
-        if (leftBtm && rightBtm) {  // 左下と右下がブロック内
+        else if (leftBtm && rightBtm) {  // 左下と右下がブロック内
             return RectBounds.Location.BOTTOM;
         }
-        if (leftTop && leftBtm) {   // 左上と左下がブロック内
+        else if (leftTop && leftBtm) {   // 左上と左下がブロック内
             return RectBounds.Location.LEFT;
         }
-        if (rightTop && rightBtm) { // 右上と右下がブロック内
+        else if (rightTop && rightBtm) { // 右上と右下がブロック内
             return RectBounds.Location.RIGHT;
         }
-        if (leftTop) {  // 左上
+        else if (leftTop) {  // 左上
             return RectBounds.Location.L_TOP;
         }
-        if (rightTop) { // 右上
+        else if (rightTop) { // 右上
             return RectBounds.Location.R_TOP;
         }
-        if (leftBtm) {  // 左下
+        else if (leftBtm) {  // 左下
             return RectBounds.Location.L_BOTTOM;
         }
-        if (rightBtm) { // 右下
+        else if (rightBtm) { // 右下
             return RectBounds.Location.R_BOTTOM;
         }
-        return RectBounds.Location.NIL;
+        else
+            return RectBounds.Location.NIL;
     }
 
     public void setVx(double vx)
@@ -128,11 +129,9 @@ public class Ball extends Sprite
             this.delay--;
             return ;
         }
-//        if (landed)
-//            return;
 
-        x += vx;
-        y += vy;
+        x += vx * eta;
+        y += vy * eta;
 
         // 飛んでいる場合はhogehoge処理
         if (!landed) {
@@ -145,7 +144,7 @@ public class Ball extends Sprite
             }
 
             //地面についたらフラグを立てる
-            if (y + SIZE > Game.HEIGHT) {
+            if ((int)(y + SIZE+1) > Game.FLOOR_Y) {
                 this.landed = true;
             }
         }

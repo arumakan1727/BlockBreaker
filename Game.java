@@ -20,10 +20,11 @@ import java.io.IOException;
 public class Game implements GameProcess
 {
     public static final int WIDTH   = 720;
-    public static final int HEIGHT  = 540;
-    public static BufferedImage img_ball, img_block, img_hexagonBack;
+    public static final int HEIGHT  = 720;
+    public static final int FLOOR_Y = HEIGHT - 30;
+    public static BufferedImage img_ball, img_block, img_hexagonBack, img_floor;
 
-    private GameState gameState;
+    private volatile GameState gameState;
 
     private final Component     screen;
     private final BlockManager  blockManager;
@@ -35,6 +36,7 @@ public class Game implements GameProcess
             img_ball = ImageIO.read(Game.class.getResourceAsStream("/resources/ball.png"));
             img_block = ImageIO.read(Game.class.getResourceAsStream("/resources/block-bebel.png"));
             img_hexagonBack = ImageIO.read(Game.class.getResourceAsStream("/resources/hexagon-back.jpeg"));
+            img_floor = ImageIO.read(Game.class.getResourceAsStream("/resources/floor.png"));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(2);
@@ -43,9 +45,10 @@ public class Game implements GameProcess
 
     private Game(BufferingRenderer renderer)
     {
+        this.gameState = GameState.CLICK_WAIT;
         this.screen = (Component) renderer;
         this.blockManager = new BlockManager(img_block, this.gameState);
-        this.ballManager = new BallManager(img_ball, this.gameState);
+        this.ballManager = new BallManager(img_ball, blockManager.getBlocks(), this.gameState);
 
         this.eventListenInit(this.screen);
 
@@ -60,48 +63,6 @@ public class Game implements GameProcess
         });
     }
 
-    private void eventListenInit(Component screen)
-    {
-        this.screen.addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mouseClicked(MouseEvent ev)
-            {
-                // CLICK_WAITの時にマウスの左ボタンがクリックされたら gameState を変更
-                if ( (gameState == GameState.CLICK_WAIT) && (ev.getButton() == MouseEvent.BUTTON1) )
-                {
-                    gameState = GameState.NOW_CLICKED;
-                    gameState.mousePos.x = ev.getX();
-                    gameState.mousePos.y = ev.getY();
-                }
-            }
-        });
-
-        this.screen.addKeyListener(new KeyAdapter()
-        {
-            @Override
-            public void keyPressed(KeyEvent ev)
-            {
-                switch (ev.getKeyCode()) {
-                    case KeyEvent.VK_SPACE:
-                        gameState.keyPressed_space = true;
-                        break;
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent ev)
-            {
-                switch (ev.getKeyCode()) {
-                    case KeyEvent.VK_SPACE:
-                        gameState.keyPressed_space = false;
-                        break;
-                }
-            }
-        });
-    }
-
-
     @Override
     public void initialize()
     {
@@ -112,7 +73,7 @@ public class Game implements GameProcess
     @Override
     public void update()
     {
-
+        this.gameState = ballManager.update(this.gameState);
     }
 
     @Override
@@ -127,10 +88,64 @@ public class Game implements GameProcess
             }
         }
         blockManager.draw(g2d);
+        ballManager.draw(g2d);
+
+        g2d.drawImage(img_floor, 0, FLOOR_Y, null);
     }
 
     public static void main(String[] args)
     {
         new Game(new GamePanel(WIDTH, HEIGHT));
     }
+
+    private void eventListenInit(Component screen)
+    {
+        this.screen.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseClicked(MouseEvent ev)
+            {
+                // CLICK_WAITの時にマウスの左ボタンがクリックされたら gameState を変更
+                System.out.println("mouse: " + ev.getX() + ", " + ev.getY() + "   state: " + gameState);
+                Game.this.screen.requestFocus();
+
+                if ( (gameState == GameState.CLICK_WAIT)
+                        && (ev.getButton() == MouseEvent.BUTTON1)
+                        && ev.getY() < FLOOR_Y - (Ball.SIZE + 25) )
+                {
+                    gameState = GameState.NOW_CLICKED;
+                    gameState.mousePos.x = ev.getX();
+                    gameState.mousePos.y = ev.getY();
+                }
+            }
+        });
+
+        /*
+        this.screen.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyPressed(KeyEvent ev)
+            {
+                switch (ev.getKeyCode()) {
+                    case KeyEvent.VK_SPACE:
+                        System.out.println("spaceKey pressed");
+                        gameState.keyPressed_space = true;
+                        break;
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent ev)
+            {
+                switch (ev.getKeyCode()) {
+                    case KeyEvent.VK_SPACE:
+                        System.out.println("spaceKey released");
+                        gameState.keyPressed_space = false;
+                        break;
+                }
+            }
+        });
+        */
+    }
+
 }

@@ -11,6 +11,12 @@ public enum GameState
     BLOCK_DOWN,
     GAMEOVER;
 
-    public Point mousePos;
+    public Point mousePos = new Point();
     public boolean keyPressed_space = false;
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + mousePos.toString();
+    }
 }

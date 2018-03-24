@@ -30,6 +30,11 @@ public class BlockManager
         ImageEffect.addRGB(img_blocks[3], 90, 90, -20);
     }
 
+    public List<Block> getBlocks()
+    {
+        return this.blocks;
+    }
+
     public void draw(Graphics2D g2d)
     {
         for (int i  = 0; i < NUM_BLOCK_COLOR; ++i) {

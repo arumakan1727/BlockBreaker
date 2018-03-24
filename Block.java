@@ -22,6 +22,21 @@ public class Block extends Sprite
     {
         return (new RectBounds(x, y, x+WIDTH, y+HEIGHT));
     }
+
+    public void addDamage()
+    {
+        this.life--;
+        if (life == 0) {
+            this.vanish();
+        }
+    }
+
+    @Override
+    public void vanish()
+    {
+        super.vanish();
+    }
+
     @Override
     public void update(double eta)
     {

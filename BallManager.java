@@ -1,30 +1,34 @@
 package myGame;
 
+import ydk.game.sprite.Sprite;
+
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class BallManager
 {
     public static final Point DEFAULT_START_POS
-            = new Point(Game.WIDTH / 2, Game.HEIGHT - Ball.SIZE);    //ボールの左上の座標
+            = new Point(Game.WIDTH / 2, Game.FLOOR_Y - Ball.SIZE);    //ボールの左上の座標
 
     private static BufferedImage img_ball;
 
-    private final List<Ball> balls;
-    private GameState gameState;
+    private final BallArrayList<Ball> balls;
     private Point preLaunchPos;
-    private Point mouseClickedPos;
+    private List<Block> blocks;
 
-    public BallManager(BufferedImage src, GameState state)
+    public BallManager(BufferedImage src, List<Block> list,  GameState state)
     {
         img_ball = src;
-        this.gameState = state;
-        this.balls = new ArrayList<>();
-        this.preLaunchPos = DEFAULT_START_POS;
-        this.mouseClickedPos = new Point();
+        this.blocks = list;
 
+        System.out.println(state);
+
+        this.balls = new BallArrayList<>();
+        this.preLaunchPos = DEFAULT_START_POS;
         this.init();
     }
 
@@ -36,27 +40,60 @@ public class BallManager
         }
     }
 
-    public void update()
+    public List<Ball> getBalls()
     {
-        switch (this.gameState)
+        return this.balls;
+    }
+
+    public void setBlocks(List<Block> list)
+    {
+        this.blocks = list;
+    }
+
+    public List<Block> getBlocks()
+    {
+        return this.blocks;
+    }
+
+    public GameState update(GameState gameState)
+    {
+        switch (gameState)
         {
             case MAIN_MENU:
                 break;
+
             case NOW_CLICKED:
-                prepareLaunch();
+                prepareLaunch(gameState);
                 gameState = GameState.BALL_FLYING;
                 break;
+
             case BALL_FLYING:
-                ballMove();
+                gameState =  ballMove(gameState);
                 break;
+
             case CLICK_WAIT:
             case BLOCK_DOWN:
                 break;
         }
+
+        return gameState;
     }
 
-    private void prepareLaunch() //発射準備
+    public void draw(Graphics2D g2d)
     {
+        Sprite.draw(balls, g2d);
+    }
+
+    //=========================================================================================================
+
+    private boolean isPrepareLaunchPosision(Ball b)
+    {
+        return ((int)b.getX() == preLaunchPos.x && (int)b.getY() == preLaunchPos.y);
+    }
+
+    private void prepareLaunch(GameState gameState) //発射準備
+    {
+        System.out.println("prepareLaunch");
         /*マウスに向けて飛ぶように速度(向き)を算出 */
         //ボールの左上の座標
         final double nextX = gameState.mousePos.x - Ball.SIZE;
@@ -79,15 +116,16 @@ public class BallManager
         }
     }
 
-    private void ballMove()
+    private GameState ballMove(GameState gameState)
     {
         // 初発のボールが地面についたか判定
-        Ball b = balls.get(0);
-        if (b.isLanded())
         {
-            // 以降のボールの着地した後の定位置
-            preLaunchPos.x = (int)b.getX();
-            preLaunchPos.y = (int)b.getY();
+            Ball b = balls.frontElement();
+            if (b.isLanded()) {
+                // 以降のボールの着地した後の定位置
+                preLaunchPos.x = (int) b.getX();
+                preLaunchPos.y = (int) b.getY();
+            }
         }
 
         // 更新
@@ -97,9 +135,8 @@ public class BallManager
             {
                 v.setVy(0); //地面に付いているので上下運動なし
 
-                if ((int) v.getX() == preLaunchPos.x && (int) v.getY() == preLaunchPos.y) {
-                    // 止める
-                    v.setVx(0);
+                if (isPrepareLaunchPosision(v)) {
+                    v.setVx(0); // 止める
                 } else {
                     // TODO: 発射場所へ水平移動
                     if ((int)v.getX() < preLaunchPos.x) { //定位置よりも左にある
@@ -111,9 +148,62 @@ public class BallManager
             }
             else    //まだ飛んでいる時
             {
-                v.update(gameState.keyPressed_space ? 1.0 : 2.0);
                 // TODO: ブロックとの当たり判定
+                Iterator<Block> it = blocks.iterator();
+                while(it.hasNext())
+                {
+                    Block b = it.next();
+                    RectBounds.Location location =  v.collision(b);
+
+                    // NILでない(=ブロックとヒットした)
+                    if (location != RectBounds.Location.NIL) {
+                        b.addDamage(); //life を-1する その後の処理はブロックに委譲
+                        System.out.println("block hit");
+
+                        switch (location) {
+                            case TOP:
+                            case BOTTOM:
+                                v.setVy(-(v.getVy()));
+                                break;
+                            case LEFT:
+                            case RIGHT:
+                                v.setVx(-(v.getVx()));
+                                break;
+                            default:
+                                v.setVy(-(v.getVy()));
+                                v.setVx(-(v.getVx()));
+                        }
+
+                        // ブロックとの衝突数は1つまで
+                        break;
+                    }
+                }
             }
+            v.update(gameState.keyPressed_space ? 1.5 : 1.0);
+        }
+
+        // 最後尾のボールが定位置についたか判定
+        // 先頭のボールが地面についているかを判定しないとア
+        {
+            Ball b = balls.backElement();
+            if (balls.frontElement().isLanded() &&  isPrepareLaunchPosision(b)) {
+                gameState = GameState.BLOCK_DOWN;
+            }
+        }
+
+        return gameState;
+    }
+
+    static private class BallArrayList<E> extends ArrayList<E>
+    {
+        public E frontElement()
+        {
+            return this.get(0);
+        }
+
+        public E backElement()
+        {
+            return this.get( this.size()-1 );
         }
     }
 }
