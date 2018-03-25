@@ -22,7 +22,7 @@ public class Game implements GameProcess
     public static final int WIDTH   = 720;
     public static final int HEIGHT  = 540;
     public static final int FLOOR_Y = HEIGHT - 30;
-    public static BufferedImage img_ball, img_block, img_hexagonBack, img_floor;
+    public static BufferedImage img_ball, img_block, img_bonusPanel, img_hexagonBack, img_floor;
 
     private volatile GameState gameState;
 
@@ -33,10 +33,11 @@ public class Game implements GameProcess
     static {    //最初に一度だけ実行: 画像読み込み
         System.out.println("Game static init");
         try {
-            img_ball = ImageIO.read(Game.class.getResourceAsStream("/resources/ball.png"));
-            img_block = ImageIO.read(Game.class.getResourceAsStream("/resources/block-dark.png"));
+            img_ball        = ImageIO.read(Game.class.getResourceAsStream("/resources/ball.png"));
+            img_block       = ImageIO.read(Game.class.getResourceAsStream("/resources/block-dark.png"));
+            img_bonusPanel  = ImageIO.read(Game.class.getResourceAsStream("/resources/bonusPanel.png"));
             img_hexagonBack = ImageIO.read(Game.class.getResourceAsStream("/resources/hexagon-back.jpeg"));
-            img_floor = ImageIO.read(Game.class.getResourceAsStream("/resources/floor.png"));
+            img_floor       = ImageIO.read(Game.class.getResourceAsStream("/resources/floor.png"));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(2);

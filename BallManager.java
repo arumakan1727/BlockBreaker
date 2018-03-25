@@ -17,6 +17,7 @@ public class BallManager
     public static final Point DEFAULT_START_POS
             = new Point(Game.WIDTH / 2, Game.FLOOR_Y - Ball.SIZE);    //ボールの左上の座標
     private static BufferedImage img_ball;
+    private static final double SCALE_KEY_PRESSED_SPEED = 1.6;
 
     private final BallArrayList<Ball> balls;
     private Point preLaunchPos;
@@ -156,25 +157,15 @@ public class BallManager
             else    //まだ飛んでいる時
             {
                 // TODO: ブロックとの当たり判定
-//                Iterator<Block> it = blocks.iterator();
-//                while(it.hasNext())
-//                {
-//                    Block b = it.next();
-//                    if (v.getBounds().collision(b.getBounds())) {
-//                        onHitBlock(v, b);
-//                        b.addDamage();
-//                         ブロックとの衝突数は1つまで
-//                        break;
-//                    }
-//                }
                 colideJudge(v);
             }
             allisPreLaunchPos &= v.isPrepareLaunchPos();
-            v.update(gameState.keyPressed_space ? 2.2 : 1.0);
+            v.update(gameState.keyPressed_space ? SCALE_KEY_PRESSED_SPEED : 1.0);
         }
 
         if (allisPreLaunchPos) {
-            gameState = GameState.CLICK_WAIT;
+            System.out.println("allisPreLaunchPos.");
+            gameState = GameState.BLOCK_DOWN;
         }
 
         return gameState;
@@ -190,8 +181,14 @@ public class BallManager
             Block b = it.next();
             final RectBounds blockBounds = b.getBounds();
             if (ballBounds.collision(blockBounds)) {
-                corner.orAll( RectBounds.getCornerCollisionState(ballBounds, blockBounds));
-                b.addDamage();
+                if (b instanceof BonusPanel) {
+                    // TODO: ボールが増える
+                    b.vanish();
+                }
+                else {
+                    corner.orAll(RectBounds.getCornerCollisionState(ballBounds, blockBounds));
+                    b.addDamage();
+                }
             }
         }
         checkHitBlock(v, corner);

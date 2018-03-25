@@ -17,7 +17,7 @@ public class Block extends Sprite
     public static final int FONT_SIZE = 28;
 
     private int life;
-    private final BufferedImage img;
+    protected final BufferedImage img;
 
     public Block(final BufferedImage img, int x, int y, int life)
     {
