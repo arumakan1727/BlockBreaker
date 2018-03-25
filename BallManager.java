@@ -20,6 +20,8 @@ public class BallManager
 
     private final BallArrayList<Ball> balls;
     private Point preLaunchPos;
+    private boolean anyLanded;
+
     private List<Block> blocks;
 
     public BallManager(BufferedImage src, List<Block> list)
@@ -35,7 +37,7 @@ public class BallManager
     public void init()
     {
         balls.clear();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 6; i++) {
             balls.add(new Ball(img_ball, DEFAULT_START_POS));
         }
     }
@@ -54,6 +56,12 @@ public class BallManager
     {
         return this.blocks;
     }
+
+    public void draw(Graphics2D g2d)
+    {
+        Sprite.draw(balls, g2d);
+    }
+
 
     public GameState update(GameState gameState)
     {
@@ -79,11 +87,6 @@ public class BallManager
         return gameState;
     }
 
-    public void draw(Graphics2D g2d)
-    {
-        Sprite.draw(balls, g2d);
-    }
-
     //=========================================================================================================
 
     private boolean isPrepareLaunchPosision(Ball b)
@@ -97,6 +100,7 @@ public class BallManager
     private void prepareLaunch(GameState gameState) //発射準備
     {
         System.out.println("prepareLaunch");
+        this.anyLanded = false;
         /*マウスに向けて飛ぶように速度(向き)を算出 */
         //ボールの左上の座標
         final double nextX = gameState.mousePos.x - Ball.SIZE / 2;
@@ -105,7 +109,6 @@ public class BallManager
         // 角度計算
         final double rad = Math.atan2(nextY - preLaunchPos.y,
                 nextX - preLaunchPos.x);
-        System.out.println("Degree: " + Math.toDegrees(rad));
 
         final double vx = Ball.SPEED_FLY * Math.cos(rad); // x 方向の速度
         final double vy = Ball.SPEED_FLY * Math.sin(rad);
@@ -124,21 +127,17 @@ public class BallManager
     {
         boolean allisPreLaunchPos = true;
 
-        // 初発のボールが地面についたか判定
-        {
-            Ball b = balls.frontElement();
-            if ( (int)b.getX() != preLaunchPos.x && b.isLanded()) {
-                // 以降のボールの着地した後の定位置
-                preLaunchPos.x = (int) b.getX();
-                preLaunchPos.y = (int) b.getY();
-            }
-        }
-
         // 更新
         for (Ball v : balls)
         {
             if (v.isLanded()) //地面についているとき
             {
+                if (!anyLanded) { //まだ誰も着地していない時
+                    preLaunchPos.x = (int)v.getX();
+                    preLaunchPos.y = Game.FLOOR_Y - Ball.SIZE;
+                    anyLanded = true;
+                }
+
                 v.setVy(0);
                 v.setY(preLaunchPos.y);
 
@@ -157,24 +156,23 @@ public class BallManager
             else    //まだ飛んでいる時
             {
                 // TODO: ブロックとの当たり判定
-                Iterator<Block> it = blocks.iterator();
-                while(it.hasNext())
-                {
-                    Block b = it.next();
-                    if (v.getBounds().collision(b.getBounds())) {
-                        onHitBlock(v, b);
-                        b.addDamage();
-                        // ブロックとの衝突数は1つまで
-                        break;
-                    }
-                }
+//                Iterator<Block> it = blocks.iterator();
+//                while(it.hasNext())
+//                {
+//                    Block b = it.next();
+//                    if (v.getBounds().collision(b.getBounds())) {
+//                        onHitBlock(v, b);
+//                        b.addDamage();
+//                         ブロックとの衝突数は1つまで
+//                        break;
+//                    }
+//                }
+                colideJudge(v);
             }
             allisPreLaunchPos &= v.isPrepareLaunchPos();
-            v.update(gameState.keyPressed_space ? 1.8 : 1.0);
+            v.update(gameState.keyPressed_space ? 2.2 : 1.0);
         }
 
-        // 最後尾のボールが定位置についたか判定
-        // 先頭のボールが地面についているかを判定しないとア
         if (allisPreLaunchPos) {
             gameState = GameState.CLICK_WAIT;
         }
@@ -182,54 +180,25 @@ public class BallManager
         return gameState;
     }
 
-    /*
-    private void onHitBlock(Ball v, Block block)
+    private void colideJudge(final Ball v)
     {
-        final int right =   (int)v.getX() + Ball.SIZE;
-        final int left =    (int)v.getX();
-        final int top =     (int)v.getY();
-        final int bottom =  (int)v.getY() + Ball.SIZE;
+        RectBounds.CornerCollisionState corner = new RectBounds.CornerCollisionState();
+        Iterator<Block> it = blocks.iterator();
+        final RectBounds ballBounds = v.getBounds();
 
-        System.out.printf("right:%3d  left:%3d  top:%3d  bottom:%3d\n", right, left, top, bottom);
-        //左上かど -> 左上へ
-        if(right < block.getX() && bottom < block.getY()) {
-            System.out.println("Left top");
-            v.setVx( -1 * abs(v.getVx()));
-            v.setVy( -1 * abs(v.getVy()));
+        while (it.hasNext()) {
+            Block b = it.next();
+            final RectBounds blockBounds = b.getBounds();
+            if (ballBounds.collision(blockBounds)) {
+                corner.orAll( RectBounds.getCornerCollisionState(ballBounds, blockBounds));
+                b.addDamage();
+            }
         }
-        //右上かど -> 右上へ
-        else if (left > block.getX()+Block.WIDTH && bottom < block.getY()) {
-            System.out.println("Right top");
-            v.setVx( abs(v.getVx()));
-            v.setVy( -1 * abs(v.getVy()));
-        }
-        //左下かど
-        else if (right < block.getX() && top > block.getY()+Block.HEIGHT) {
-            System.out.println("Left bottom");
-            v.setVx( -1 * abs(v.getVx()));
-            v.setVy( abs(v.getVy()));
-        }
-        //右下かど
-        else if (left > block.getX()+Block.WIDTH && top > block.getY() + Block.HEIGHT) {
-            System.out.println("Right bottom");
-            v.setVx( abs(v.getVx()));
-            v.setVy( abs(v.getVy()));
-        }
-        else if (right < block.getX() || left > block.getX()+Block.WIDTH) {
-            System.out.println("Horizontal side");
-            v.invertVx();
-        }
-        else {
-            System.out.println("Vertical side");
-            v.invertVy();
-        }
-        v.update(1);
+        checkHitBlock(v, corner);
     }
-    */
-    public void onHitBlock(Ball v, Block block)
+
+    private void onHitBlock(Ball v, RectBounds.Location location)
     {
-//        RectBounds.Location location = v.collision(block);
-        RectBounds.Location location = RectBounds.whereCollisionAt(v.getBounds(), block.getBounds());
         System.out.println("ball location: " + location);
         switch (location) {
             case RIGHT:
@@ -260,6 +229,20 @@ public class BallManager
                 break;
         }
         v.update(1);
+    }
+
+    private void checkHitBlock(Ball v, RectBounds.CornerCollisionState corner)
+    {
+        RectBounds.Location location = corner.whereCollisionAt();
+        if (location != RectBounds.Location.NIL) {
+            onHitBlock(v, location);
+        }
+    }
+
+    private void onHitBlock(Ball v, Block block)
+    {
+        RectBounds.Location location = RectBounds.whereCollisionAt(v.getBounds(), block.getBounds());
+        onHitBlock(v, location);
     }
 
     static private class BallArrayList<E> extends ArrayList<E>

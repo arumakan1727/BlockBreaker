@@ -13,10 +13,10 @@ import java.util.Random;
 public class BlockManager
 {
     public static final int NUM_BLOCK_COLOR = 4;
-    public static final int MARGIN_X = 5;
-    public static final int MARGIN_Y = 5;
+    public static final int MARGIN_X = 3;
+    public static final int MARGIN_Y = 3;
     public static final int OFFSET_X = 40;
-    public static final int OFFSET_Y = 10;
+    public static final int OFFSET_Y = 5;
     public static final int DEFAULT_HP = 10;
     private static final int NUM_BLOCK_HORIZONTAL = 6;
     private static final int NUM_BLOCK_VERTICAL = 5;
@@ -31,10 +31,10 @@ public class BlockManager
         for (int i = 0; i < NUM_BLOCK_COLOR; i++) {
             img_blocks[i] = ImageUtil.imageCopy(src);
         }
-        ImageEffect.addRGB(img_blocks[0], 200, 0, 0);
-        ImageEffect.addRGB(img_blocks[1], 0, 150, 0);
-        ImageEffect.addRGB(img_blocks[2], 0, 0, 200);
-        ImageEffect.addRGB(img_blocks[3], 90, 90, -20);
+        ImageEffect.addRGB(img_blocks[0], 180, 0, 0);
+        ImageEffect.addRGB(img_blocks[1], 0, 180, 0);
+        ImageEffect.addRGB(img_blocks[2], 0, 0, 180);
+        ImageEffect.addRGB(img_blocks[3], 150, 150, -20);
 
         init();
     }
@@ -45,14 +45,19 @@ public class BlockManager
 
         for (int i = 0; i < NUM_BLOCK_VERTICAL; ++i) {
             int y = OFFSET_Y + i * (Block.HEIGHT + MARGIN_Y);
-            blocks.addAll(createHorizontalBlockArray(y, 1));
+            blocks.addAll(createHorizontalBlockArray(y, 2));
         }
         System.out.println("BlockManager#init : blocks_size = " + blocks.size());
     }
 
-    public List<Block> getBlocks()
+    public GameState update(GameState gameState)
     {
-        return this.blocks;
+        switch (gameState)
+        {
+            case BLOCK_DOWN:
+                gameState = GameState.CLICK_WAIT;
+        }
+        return gameState;
     }
 
     public void draw(Graphics2D g2d)
@@ -86,4 +91,10 @@ public class BlockManager
 
         return list;
     }
+
+    public List<Block> getBlocks()
+    {
+        return this.blocks;
+    }
+
 }

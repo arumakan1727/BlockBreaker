@@ -8,8 +8,8 @@ import java.awt.image.BufferedImage;
 
 public class Ball extends Sprite
 {
-    public static final int SIZE = 20;
-    public static final double SPEED_FLY = 5;
+    public static final int SIZE = 18;
+    public static final double SPEED_FLY = 2;
     public static final double SPEED_ARRANGEMENT = 5;
 
     private final BufferedImage img;

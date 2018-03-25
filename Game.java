@@ -34,7 +34,7 @@ public class Game implements GameProcess
         System.out.println("Game static init");
         try {
             img_ball = ImageIO.read(Game.class.getResourceAsStream("/resources/ball.png"));
-            img_block = ImageIO.read(Game.class.getResourceAsStream("/resources/block-bebel.png"));
+            img_block = ImageIO.read(Game.class.getResourceAsStream("/resources/block-dark.png"));
             img_hexagonBack = ImageIO.read(Game.class.getResourceAsStream("/resources/hexagon-back.jpeg"));
             img_floor = ImageIO.read(Game.class.getResourceAsStream("/resources/floor.png"));
         } catch (IOException e) {
@@ -74,6 +74,7 @@ public class Game implements GameProcess
     public void update()
     {
         this.gameState = ballManager.update(this.gameState);
+        this.gameState = blockManager.update(this.gameState);
     }
 
     @Override
