@@ -53,49 +53,6 @@ public class Ball extends Sprite
         return (new RectBounds(x, y, x+SIZE, y+SIZE));
     }
 
-    /**
-     * 引数の{@link Block}インスタンスとどの部位で衝突しているかを返します。<br>
-     * なお, 衝突していない場合は RectBounds.Location#NIL を返り値とします。
-     * @param b Block
-     * @return <u><strong>ボールにおける</strong></u>衝突部位
-     * @see RectBounds.Location
-     */
-    public RectBounds.Location collision(Block b)
-    {
-        final RectBounds rect = b.getBounds();
-        final boolean leftTop   = rect.containts(x,y);
-        final boolean rightTop  = rect.containts(x+SIZE, y);
-        final boolean leftBtm   = rect.containts(x, y+SIZE);
-        final boolean rightBtm  = rect.containts(x+SIZE, y+SIZE);
-
-        if (leftTop && rightTop) {  // 左上と右上がブロック内
-            return RectBounds.Location.TOP;
-        }
-        else if (leftBtm && rightBtm) {  // 左下と右下がブロック内
-            return RectBounds.Location.BOTTOM;
-        }
-        else if (leftTop && leftBtm) {   // 左上と左下がブロック内
-            return RectBounds.Location.LEFT;
-        }
-        else if (rightTop && rightBtm) { // 右上と右下がブロック内
-            return RectBounds.Location.RIGHT;
-        }
-        else if (leftTop) {  // 左上
-            return RectBounds.Location.LEFT_TOP;
-        }
-        else if (rightTop) { // 右上
-            return RectBounds.Location.RIGHT_TOP;
-        }
-        else if (leftBtm) {  // 左下
-            return RectBounds.Location.LEFT_BOTTOM;
-        }
-        else if (rightBtm) { // 右下
-            return RectBounds.Location.RIGHT_BOTTOM;
-        }
-        else
-            return RectBounds.Location.NIL;
-    }
-
     public void setVx(double vx)
     {
         this.vx = vx;
@@ -147,11 +104,12 @@ public class Ball extends Sprite
         // 飛んでいる場合はhogehoge処理
         if (!landed) {
             // 画面の縁に触れたなら向きを反転
-            if ((x < 0) || (x + SIZE > Game.WIDTH)) {
+            if ((x < 0) || (x + SIZE > Game.STATUS_PANEL_X)) {
                 vx = -vx;
             }
             if (y < 0) {
                 vy = -vy;
+                y = 1;
             }
 
             //地面についたらフラグを立てる

@@ -17,7 +17,7 @@ public class Block extends Sprite
     public static final int FONT_SIZE = 28;
 
     private int life;
-    protected final BufferedImage img;
+    final BufferedImage img;
 
     public Block(final BufferedImage img, int x, int y, int life)
     {
@@ -66,7 +66,6 @@ public class Block extends Sprite
 
         {
             String HP = String.valueOf(this.life);
-            final int len = HP.length();
 
             Font font = new Font(Font.MONOSPACED, Font.BOLD, FONT_SIZE);
             g2d.setFont(font);

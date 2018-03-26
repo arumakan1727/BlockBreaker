@@ -7,27 +7,29 @@ import ydk.image.ImageUtil;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 public class BlockManager
 {
-    public static final int NUM_BLOCK_COLOR = 4;
-    public static final int MARGIN_X = 3;
-    public static final int MARGIN_Y = 3;
-    public static final int OFFSET_X = 40;
-    public static final int OFFSET_Y = 3;
-    public static final int DEFAULT_HP = 10;
+    private static final int NUM_BLOCK_COLOR = 4;
+    private static final int MARGIN_X = 3;
+    private static final int MARGIN_Y = 3;
+    private static final int OFFSET_X = 40;
+    private static final int OFFSET_Y = 3;
     private static final int NUM_BLOCK_HORIZONTAL = 6;
     private static final int NUM_BLOCK_VERTICAL = 5;
     private static final int DEFAULT_BLOCK_DOWN_SPEED = 5;
     private static final double VALUE_DOWN_SPEED_SLOW = 0.33;
-    private static final int BONUS_PROBABILITY = 30;
+    private static final int BONUS_PROBABILITY = 50;
+//    private static final int DEFAULT_HP = 10;
 
     private final static BufferedImage img_blocks[] = new BufferedImage[NUM_BLOCK_COLOR];
     private final List<Block> blocks;
 
     private double blockDownSpeed;
+    private int delay;
 
     public BlockManager(BufferedImage src)
     {
@@ -50,16 +52,17 @@ public class BlockManager
 
         for (int i = 0; i < NUM_BLOCK_VERTICAL; ++i) {
             int y = OFFSET_Y + i * (Block.HEIGHT + MARGIN_Y);
-            blocks.addAll(createHorizontalBlockArray(y, 3, BONUS_PROBABILITY));
+            blocks.addAll(createHorizontalBlockArray(y, 3, BONUS_PROBABILITY, BallManager.DEFAULT_BALL_COUNT));
         }
-        blocks.addAll(createHorizontalHideArray(3));
+        blocks.addAll(createHorizontalHideArray(3, BallManager.DEFAULT_BALL_COUNT));
         blockDownSpeed = DEFAULT_BLOCK_DOWN_SPEED;
+        delay = 20;
         System.out.println("BlockManager#init : blocks_size = " + blocks.size());
     }
 
     public GameState update(GameState gameState)
     {
-        switch (gameState)
+        switch (gameState.state)
         {
             case BLOCK_DOWN:
                 gameState = blockDown(gameState);
@@ -74,26 +77,36 @@ public class BlockManager
 
     private GameState blockDown(GameState gameState)
     {
+        if (delay > 0) {
+            delay--;
+            return gameState;
+        }
         if (blockDownSpeed < 0) {
             blockDownSpeed = DEFAULT_BLOCK_DOWN_SPEED;
-            gameState = GameState.CLICK_WAIT;
-            blocks.addAll(createHorizontalHideArray(3));
+            delay = 20;
+            gameState.state = GameState.State.CLICK_WAIT;
+            blocks.addAll(createHorizontalHideArray(3, gameState.getBallCount()));
+            gameState.countUpWave();
         }
         else {
             for (Block e : blocks) {
                 e.addY(blockDownSpeed);
+                if (e.getY() + Block.HEIGHT > Game.FLOOR_Y) {
+                    gameState.state = GameState.State.GAMEOVER;
+                    return gameState;
+                }
             }
             blockDownSpeed -= VALUE_DOWN_SPEED_SLOW;
         }
         return gameState;
     }
 
-    private List<Block> createHorizontalHideArray(int num_void)
+    private List<Block> createHorizontalHideArray(int num_void, int ballCount)
     {
-        return createHorizontalBlockArray(-1*Block.HEIGHT - OFFSET_Y+2, num_void, BONUS_PROBABILITY);
+        return createHorizontalBlockArray(-1*Block.HEIGHT - OFFSET_Y+2, num_void, BONUS_PROBABILITY, ballCount);
     }
 
-    private List<Block> createHorizontalBlockArray(int y, int num_void, int bonusProbab)
+    private List<Block> createHorizontalBlockArray(int y, int num_void, int bonusProbab, int ballCount)
     {
         if (num_void > NUM_BLOCK_HORIZONTAL)
             throw new IllegalArgumentException("num_void is larger than NUM_BLOCK_HORIZONTAL");
@@ -101,25 +114,36 @@ public class BlockManager
         List<Block> list = new ArrayList<>();
         Random rand = new Random();
         boolean is_void[] = new boolean[NUM_BLOCK_HORIZONTAL];
+        int bonusPos = -1;
 
-        boolean bonusExist = false;
-
-        // 空にする場所を決める
-        for (int r, i=0; i < num_void; ++i) {
-            do {
-                r = rand.nextInt(NUM_BLOCK_HORIZONTAL);
-            } while (is_void[r] == true);
-            is_void[r] = true;
-        }
-
-        for (int i=0; i<NUM_BLOCK_HORIZONTAL; ++i) {
-            if (!is_void[i]) {
-                int x = OFFSET_X + i * (Block.WIDTH + MARGIN_X);
-                list.add(new Block(img_blocks[rand.nextInt(NUM_BLOCK_COLOR)], x, y, DEFAULT_HP));
+        {
+            List<Integer> voidPoslist = new ArrayList<>();
+            int r;
+            // 空にする場所を決める
+            for (int i = 0; i < num_void; ++i) {
+                do {
+                    r = rand.nextInt(NUM_BLOCK_HORIZONTAL);
+                } while (is_void[r] == true);
+                is_void[r] = true;
+                voidPoslist.add(r);
             }
-            else if (rand.nextInt(100) < bonusProbab && !bonusExist){ //空白だったらボーナスパネルを置くか決める
-                int x = OFFSET_X + i * (Block.WIDTH + MARGIN_X) + BonusPanel.DIFF_WIDTH / 2;
-                list.add(new BonusPanel(Game.img_bonusPanel, x, y, 1));
+            //ボーナスパネルを置くか,　置くならどこの場所に置くかを決める
+            if (rand.nextInt(100) < bonusProbab) {
+                Collections.shuffle(voidPoslist);
+                bonusPos = voidPoslist.get(0);
+            }
+        }
+        for (int i=0; i<NUM_BLOCK_HORIZONTAL; ++i) {
+            if (is_void[i]) {
+                if (i == bonusPos) {
+                    int x = OFFSET_X + i * (Block.WIDTH + MARGIN_X) + BonusPanel.DIFF_WIDTH / 2;
+                    list.add(new BonusPanel(Game.img_bonusPanel, x, y, 1));
+                }
+            }
+            else {
+                int x = OFFSET_X + i * (Block.WIDTH + MARGIN_X);
+                int HP = ballCount + rand.nextInt((int)(1.3 * ballCount));
+                list.add(new Block(img_blocks[rand.nextInt(NUM_BLOCK_COLOR)], x, y, HP));
             }
         }
 

@@ -4,7 +4,6 @@ import ydk.game.engine.BufferingRenderer;
 import ydk.game.engine.GameEngine;
 import ydk.game.engine.GamePanel;
 import ydk.game.engine.GameProcess;
-import ydk.image.ImageEffect;
 
 import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
@@ -22,22 +21,25 @@ public class Game implements GameProcess
     public static final int WIDTH   = 720;
     public static final int HEIGHT  = 540;
     public static final int FLOOR_Y = HEIGHT - 30;
-    public static BufferedImage img_ball, img_block, img_bonusPanel, img_hexagonBack, img_floor;
+    public static final int STATUS_PANEL_X = 520;
+    public static BufferedImage img_ball, img_block, img_bonusPanel, img_hexagonBack, img_floor, img_glossPanel;
 
     private volatile GameState gameState;
 
     private final Component     screen;
     private final BlockManager  blockManager;
     private final BallManager   ballManager;
+    private final StatusRenderer statusRenderer;
 
     static {    //最初に一度だけ実行: 画像読み込み
         System.out.println("Game static init");
         try {
-            img_ball        = ImageIO.read(Game.class.getResourceAsStream("/resources/ball.png"));
-            img_block       = ImageIO.read(Game.class.getResourceAsStream("/resources/block-dark.png"));
-            img_bonusPanel  = ImageIO.read(Game.class.getResourceAsStream("/resources/bonusPanel.png"));
-            img_hexagonBack = ImageIO.read(Game.class.getResourceAsStream("/resources/hexagon-back.jpeg"));
-            img_floor       = ImageIO.read(Game.class.getResourceAsStream("/resources/floor.png"));
+            img_ball        = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/ball.png"));
+            img_block       = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/block-dark.png"));
+            img_bonusPanel  = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/bonusPanel.png"));
+            img_hexagonBack = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/hexagon-back.jpeg"));
+            img_floor       = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/floor.png"));
+            img_glossPanel  = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/gloss-panel.png"));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(2);
@@ -46,10 +48,12 @@ public class Game implements GameProcess
 
     private Game(BufferingRenderer renderer)
     {
-        this.gameState = GameState.CLICK_WAIT;
+        this.gameState = new GameState();
+        this.gameState.state = GameState.State.CLICK_WAIT;
         this.screen = (Component) renderer;
         this.blockManager = new BlockManager(img_block);
         this.ballManager = new BallManager(img_ball, blockManager.getBlocks());
+        this.statusRenderer = new StatusRenderer();
 
         this.eventListenInit(this.screen);
 
@@ -67,8 +71,7 @@ public class Game implements GameProcess
     @Override
     public void initialize()
     {
-        ImageEffect.addRGB(img_block, 240, 0, 0);
-        gameState = GameState.CLICK_WAIT;
+        gameState.state = GameState.State.CLICK_WAIT;
     }
 
     @Override
@@ -76,16 +79,22 @@ public class Game implements GameProcess
     {
         this.gameState = ballManager.update(this.gameState);
         this.gameState = blockManager.update(this.gameState);
+
+        this.statusRenderer.setWaveCount(gameState.getWaveCount());
+
+        this.gameState.setBallCount(ballManager.getBallCount());
+        this.statusRenderer.setBallCount( ballManager.getBallCount() );
     }
 
     @Override
     public void render(Graphics2D g2d)
     {
         g2d.drawImage(img_hexagonBack, 0, 0,null);
-        blockManager.draw(g2d);
         ballManager.draw(g2d);
+        blockManager.draw(g2d);
 
         g2d.drawImage(img_floor, 0, FLOOR_Y, null);
+        statusRenderer.draw(g2d);
     }
 
     public static void main(String[] args)
@@ -104,11 +113,12 @@ public class Game implements GameProcess
                 System.out.println("mouse: " + ev.getX() + ", " + ev.getY() + "   state: " + gameState);
                 Game.this.screen.requestFocus();
 
-                if ( (gameState == GameState.CLICK_WAIT)
+                if ( (gameState.state == GameState.State.CLICK_WAIT)
                         && (ev.getButton() == MouseEvent.BUTTON1)
-                        && ev.getY() < FLOOR_Y - (Ball.SIZE + 25) )
+                        && ev.getY() < FLOOR_Y - (Ball.SIZE + 25)
+                        && ev.getX() < STATUS_PANEL_X)
                 {
-                    gameState = GameState.NOW_CLICKED;
+                    gameState.state = GameState.State.NOW_CLICKED;
                     gameState.mousePos.x = ev.getX();
                     gameState.mousePos.y = ev.getY();
                 }
@@ -122,7 +132,9 @@ public class Game implements GameProcess
             {
                 switch (ev.getKeyCode()) {
                     case KeyEvent.VK_SPACE:
-                        gameState.keyPressed_space = true;
+                        if (gameState.state != GameState.State.CLICK_WAIT) {
+                            gameState.keyPressed_space = true;
+                        }
                         break;
                 }
             }
