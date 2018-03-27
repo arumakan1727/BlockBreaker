@@ -3,7 +3,6 @@ package myGame;
 public class RectBounds
 {
     private int ax, ay, bx, by;
-    private int width, height;
 
     public enum Location
     {
@@ -28,8 +27,6 @@ public class RectBounds
         this.ay = ay;
         this.bx = bx;
         this.by = by;
-        this.width = bx - ax;
-        this.height = by - ay;
     }
 
     public RectBounds(double ax, double ay, double bx, double by) throws IllegalArgumentException

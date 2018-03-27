@@ -22,14 +22,17 @@ public class Game implements GameProcess
     public static final int HEIGHT  = 540;
     public static final int FLOOR_Y = HEIGHT - 30;
     public static final int STATUS_PANEL_X = 520;
-    public static BufferedImage img_ball, img_block, img_bonusPanel, img_hexagonBack, img_floor, img_glossPanel;
+    public static BufferedImage
+            img_ball, img_block, img_bonusPanel, img_hexagonBack, img_floor, img_glossPanel,
+            img_gameover;
 
-    private volatile GameState gameState;
+    private GameState gameState;
 
     private final Component     screen;
     private final BlockManager  blockManager;
     private final BallManager   ballManager;
     private final StatusRenderer statusRenderer;
+    private final SessionRenderer sessionRenderer;
 
     static {    //最初に一度だけ実行: 画像読み込み
         System.out.println("Game static init");
@@ -40,6 +43,7 @@ public class Game implements GameProcess
             img_hexagonBack = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/hexagon-back.jpeg"));
             img_floor       = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/floor.png"));
             img_glossPanel  = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/gloss-panel.png"));
+            img_gameover  = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/gameover.jpg"));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(2);
@@ -54,6 +58,7 @@ public class Game implements GameProcess
         this.blockManager = new BlockManager(img_block);
         this.ballManager = new BallManager(img_ball, blockManager.getBlocks());
         this.statusRenderer = new StatusRenderer();
+        this.sessionRenderer = new SessionRenderer();
 
         this.eventListenInit(this.screen);
 
@@ -84,17 +89,30 @@ public class Game implements GameProcess
 
         this.gameState.setBallCount(ballManager.getBallCount());
         this.statusRenderer.setBallCount( ballManager.getBallCount() );
+
+        this.sessionRenderer.update(gameState);
     }
 
     @Override
     public void render(Graphics2D g2d)
     {
-        g2d.drawImage(img_hexagonBack, 0, 0,null);
-        ballManager.draw(g2d);
-        blockManager.draw(g2d);
+        switch (gameState.state) {
+            case MAIN_MENU:
+                break;
+            case GAMEOVER:
+            case RETURNABLE_TO_MENU:
+                sessionRenderer.draw(g2d, gameState);
+                break;
 
-        g2d.drawImage(img_floor, 0, FLOOR_Y, null);
-        statusRenderer.draw(g2d);
+            default:
+                g2d.drawImage(img_hexagonBack, 0, 0, null);
+                ballManager.draw(g2d);
+                blockManager.draw(g2d);
+
+                g2d.drawImage(img_floor, 0, FLOOR_Y, null);
+                statusRenderer.draw(g2d);
+                break;
+        }
     }
 
     public static void main(String[] args)
@@ -113,14 +131,21 @@ public class Game implements GameProcess
                 System.out.println("mouse: " + ev.getX() + ", " + ev.getY() + "   state: " + gameState);
                 Game.this.screen.requestFocus();
 
-                if ( (gameState.state == GameState.State.CLICK_WAIT)
-                        && (ev.getButton() == MouseEvent.BUTTON1)
-                        && ev.getY() < FLOOR_Y - (Ball.SIZE + 25)
-                        && ev.getX() < STATUS_PANEL_X)
-                {
-                    gameState.state = GameState.State.NOW_CLICKED;
-                    gameState.mousePos.x = ev.getX();
-                    gameState.mousePos.y = ev.getY();
+                switch (gameState.state) {
+                    case CLICK_WAIT:
+                        if ( (ev.getButton() == MouseEvent.BUTTON1)
+                                && ev.getY() < FLOOR_Y - (Ball.SIZE + 25)
+                                && ev.getX() < STATUS_PANEL_X)
+                        {
+                            gameState.state = GameState.State.NOW_CLICKED;
+                            gameState.mousePos.x = ev.getX();
+                            gameState.mousePos.y = ev.getY();
+                        }
+                        break;
+
+                    case RETURNABLE_TO_MENU:
+                        gameState.state = GameState.State.CLICK_WAIT;
+                        break;
                 }
             }
         });

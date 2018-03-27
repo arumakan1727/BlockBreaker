@@ -29,27 +29,20 @@ public class Block extends Sprite
 
     public RectBounds getBounds()
     {
-        return (new RectBounds(x+1, y+1, x+WIDTH-1, y+HEIGHT-1));
+        return (new RectBounds(x, y, x+WIDTH, y+HEIGHT));
     }
 
     public void addDamage()
     {
         this.life--;
-        if (life == 0) {
+        if (life <= 0) {
             this.vanish();
         }
     }
 
     @Override
-    public void vanish()
-    {
-        super.vanish();
-    }
-
-    @Override
     public void update(double eta)
     {
-
     }
 
     @Override

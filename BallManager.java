@@ -31,9 +31,7 @@ public class BallManager
     {
         img_ball = src;
         this.blocks = list;
-
         this.balls = new ArrayList<>();
-        this.preLaunchPos = DEFAULT_START_POS;
         this.init();
     }
 
@@ -41,6 +39,7 @@ public class BallManager
     {
         balls.clear();
         num_newBall = 0;
+        this.preLaunchPos = DEFAULT_START_POS;
         for (int i = 0; i < DEFAULT_BALL_COUNT; i++) {
             balls.add(new Ball(img_ball, DEFAULT_START_POS));
         }

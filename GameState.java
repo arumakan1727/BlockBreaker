@@ -11,7 +11,8 @@ public class GameState
         NOW_CLICKED,
         BALL_FLYING,
         BLOCK_DOWN,
-        GAMEOVER;
+        GAMEOVER,
+        RETURNABLE_TO_MENU;
     }
 
     public State state;
@@ -42,6 +43,6 @@ public class GameState
     @Override
     public String toString()
     {
-        return super.toString() + " / " + mousePos.toString();
+        return state.toString() + " / " + mousePos.toString();
     }
 }

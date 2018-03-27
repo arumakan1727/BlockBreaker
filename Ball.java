@@ -50,7 +50,7 @@ public class Ball extends Sprite
 
     public RectBounds getBounds()
     {
-        return (new RectBounds(x, y, x+SIZE, y+SIZE));
+        return (new RectBounds(x+1, y+1, x+SIZE-1, y+SIZE-1));
     }
 
     public void setVx(double vx)

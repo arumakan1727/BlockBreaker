@@ -23,7 +23,7 @@ public class BlockManager
     private static final int DEFAULT_BLOCK_DOWN_SPEED = 5;
     private static final double VALUE_DOWN_SPEED_SLOW = 0.33;
     private static final int BONUS_PROBABILITY = 50;
-//    private static final int DEFAULT_HP = 10;
+    private static final int NUM_VOID = 3;
 
     private final static BufferedImage img_blocks[] = new BufferedImage[NUM_BLOCK_COLOR];
     private final List<Block> blocks;
@@ -52,9 +52,9 @@ public class BlockManager
 
         for (int i = 0; i < NUM_BLOCK_VERTICAL; ++i) {
             int y = OFFSET_Y + i * (Block.HEIGHT + MARGIN_Y);
-            blocks.addAll(createHorizontalBlockArray(y, 3, BONUS_PROBABILITY, BallManager.DEFAULT_BALL_COUNT));
+            blocks.addAll(createHorizontalBlockArray(y, calcNUM_VOID(), BONUS_PROBABILITY, BallManager.DEFAULT_BALL_COUNT));
         }
-        blocks.addAll(createHorizontalHideArray(3, BallManager.DEFAULT_BALL_COUNT));
+        blocks.addAll(createHorizontalHideArray(calcNUM_VOID(), BallManager.DEFAULT_BALL_COUNT));
         blockDownSpeed = DEFAULT_BLOCK_DOWN_SPEED;
         delay = 20;
         System.out.println("BlockManager#init : blocks_size = " + blocks.size());
@@ -85,13 +85,14 @@ public class BlockManager
             blockDownSpeed = DEFAULT_BLOCK_DOWN_SPEED;
             delay = 20;
             gameState.state = GameState.State.CLICK_WAIT;
-            blocks.addAll(createHorizontalHideArray(3, gameState.getBallCount()));
+            blocks.addAll(createHorizontalHideArray(calcNUM_VOID(), gameState.getBallCount()));
             gameState.countUpWave();
         }
         else {
             for (Block e : blocks) {
                 e.addY(blockDownSpeed);
-                if (e.getY() + Block.HEIGHT > Game.FLOOR_Y) {
+                // 床に触れたらゲームオーバー
+                if (!(e instanceof BonusPanel) && e.getY() + Block.HEIGHT > Game.FLOOR_Y) {
                     gameState.state = GameState.State.GAMEOVER;
                     return gameState;
                 }
@@ -99,6 +100,11 @@ public class BlockManager
             blockDownSpeed -= VALUE_DOWN_SPEED_SLOW;
         }
         return gameState;
+    }
+
+    private int calcNUM_VOID()
+    {
+        return NUM_VOID + new Random().nextInt(1);
     }
 
     private List<Block> createHorizontalHideArray(int num_void, int ballCount)
@@ -142,7 +148,7 @@ public class BlockManager
             }
             else {
                 int x = OFFSET_X + i * (Block.WIDTH + MARGIN_X);
-                int HP = ballCount + rand.nextInt((int)(1.3 * ballCount));
+                int HP = 1 + ballCount + rand.nextInt((int)(0.8 * ballCount));
                 list.add(new Block(img_blocks[rand.nextInt(NUM_BLOCK_COLOR)], x, y, HP));
             }
         }
