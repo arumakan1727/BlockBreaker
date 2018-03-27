@@ -92,7 +92,7 @@ public class RectBounds
 
         public void orAll(CornerCollisionState rhs)
         {
-            System.out.println("[me]  " + this.toString() + "\n[rhs] " + rhs.toString());
+//            System.out.println("[me]  " + this.toString() + "\n[rhs] " + rhs.toString());
             this.leftTop    |= rhs.leftTop;
             this.rightTop   |= rhs.rightTop;
             this.leftBtm    |= rhs.leftBtm;

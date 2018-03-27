@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 public class Ball extends Sprite
 {
     public static final int SIZE = 18;
-    public static final double SPEED_FLY = 6;
+    public static final double SPEED_FLY = 8;
     public static final double SPEED_ARRANGEMENT = 5;
 
     private final BufferedImage img;
@@ -50,7 +50,7 @@ public class Ball extends Sprite
 
     public RectBounds getBounds()
     {
-        return (new RectBounds(x+1, y+1, x+SIZE-1, y+SIZE-1));
+        return (new RectBounds(x+2, y+2, x+SIZE-2, y+SIZE-2));
     }
 
     public void setVx(double vx)

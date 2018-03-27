@@ -15,6 +15,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URL;
 
 public class Game implements GameProcess
 {
@@ -24,7 +25,9 @@ public class Game implements GameProcess
     public static final int STATUS_PANEL_X = 520;
     public static BufferedImage
             img_ball, img_block, img_bonusPanel, img_hexagonBack, img_floor, img_glossPanel,
-            img_gameover;
+            img_gameover, img_logo;
+    public static final URL url_menuMP3, url_mainGameMP3, url_explosion, url_coin;
+    private static final String RESOURCE = "/myGame/resources/";
 
     private GameState gameState;
 
@@ -34,23 +37,30 @@ public class Game implements GameProcess
     private final StatusRenderer statusRenderer;
     private final SessionRenderer sessionRenderer;
 
-    static {    //最初に一度だけ実行: 画像読み込み
+    private MP3Player mp3Menu, mp3mainGame;
+
+    static {    //最初に一度だけ実行: 画像,音声読み込み
         System.out.println("Game static init");
         try {
-            img_ball        = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/ball.png"));
-            img_block       = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/block-dark.png"));
-            img_bonusPanel  = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/bonusPanel.png"));
-            img_hexagonBack = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/hexagon-back.jpeg"));
-            img_floor       = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/floor.png"));
-            img_glossPanel  = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/gloss-panel.png"));
-            img_gameover  = ImageIO.read(Game.class.getResourceAsStream("/myGame/resources/gameover.jpg"));
+            img_ball        = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "ball.png"));
+            img_block       = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "block-dark.png"));
+            img_bonusPanel  = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "bonusPanel.png"));
+            img_hexagonBack = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "hexagon-back.jpeg"));
+            img_floor       = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "floor.png"));
+            img_glossPanel  = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "gloss-panel.png"));
+            img_gameover    = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "gameover.jpg"));
+            img_logo        = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "logo.jpeg"));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(2);
         }
+        url_menuMP3     = Game.class.getResource(RESOURCE + "dance.MP3");
+        url_mainGameMP3 = Game.class.getResource(RESOURCE + "digitalworld.MP3");
+        url_explosion   = Game.class.getResource(RESOURCE + "explosion.MP3");
+        url_coin        = Game.class.getResource(RESOURCE + "coin.MP3");
     }
 
-    private Game(BufferingRenderer renderer)
+    private Game(final BufferingRenderer renderer)
     {
         this.gameState = new GameState();
         this.gameState.state = GameState.State.CLICK_WAIT;
@@ -76,7 +86,14 @@ public class Game implements GameProcess
     @Override
     public void initialize()
     {
-        gameState.state = GameState.State.CLICK_WAIT;
+//        gameState.state = GameState.State.CLICK_WAIT;
+        gameState.init();
+        ballManager.init();
+        blockManager.init();
+        statusRenderer.init();
+        sessionRenderer.init();
+        System.out.println("Game#initialied()   state: " + gameState.state);
+        mp3Menu = new MP3Player(url_menuMP3, true);
     }
 
     @Override
@@ -86,31 +103,36 @@ public class Game implements GameProcess
         this.gameState = blockManager.update(this.gameState);
 
         this.statusRenderer.setWaveCount(gameState.getWaveCount());
-
-        this.gameState.setBallCount(ballManager.getBallCount());
         this.statusRenderer.setBallCount( ballManager.getBallCount() );
+        this.statusRenderer.setScore(gameState.getScore());
+        this.gameState.setBallCount(ballManager.getBallCount());
 
         this.sessionRenderer.update(gameState);
+
+        if (gameState.state == GameState.State.GAMEOVER && mp3mainGame != null) {
+            mp3mainGame.stop();
+            mp3mainGame = null;
+        }
     }
 
     @Override
     public void render(Graphics2D g2d)
     {
+
+        g2d.drawImage(img_hexagonBack, 0, 0, null);
+        ballManager.draw(g2d);
+        blockManager.draw(g2d);
+
+        g2d.drawImage(img_floor, 0, FLOOR_Y, null);
+        statusRenderer.draw(g2d);
+
         switch (gameState.state) {
             case MAIN_MENU:
+                sessionRenderer.draw(g2d, gameState);
                 break;
             case GAMEOVER:
             case RETURNABLE_TO_MENU:
                 sessionRenderer.draw(g2d, gameState);
-                break;
-
-            default:
-                g2d.drawImage(img_hexagonBack, 0, 0, null);
-                ballManager.draw(g2d);
-                blockManager.draw(g2d);
-
-                g2d.drawImage(img_floor, 0, FLOOR_Y, null);
-                statusRenderer.draw(g2d);
                 break;
         }
     }
@@ -132,6 +154,12 @@ public class Game implements GameProcess
                 Game.this.screen.requestFocus();
 
                 switch (gameState.state) {
+                    case MAIN_MENU:
+                        gameState.state = GameState.State.CLICK_WAIT;
+                        if (mp3Menu != null) mp3Menu.stop();
+                        mp3mainGame = new MP3Player(url_mainGameMP3, true);
+                        break;
+
                     case CLICK_WAIT:
                         if ( (ev.getButton() == MouseEvent.BUTTON1)
                                 && ev.getY() < FLOOR_Y - (Ball.SIZE + 25)
@@ -144,7 +172,9 @@ public class Game implements GameProcess
                         break;
 
                     case RETURNABLE_TO_MENU:
-                        gameState.state = GameState.State.CLICK_WAIT;
+                        gameState.state = GameState.State.MAIN_MENU;
+                        initialize();
+                        System.gc();
                         break;
                 }
             }

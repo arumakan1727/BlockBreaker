@@ -19,8 +19,18 @@ public class GameState
     public Point mousePos = new Point();
     public boolean keyPressed_space = false;
 
-    private int waveCount = 1;
-    private int ballCount = BallManager.DEFAULT_BALL_COUNT;
+    private int waveCount;
+    private int ballCount;
+    private int score;
+
+    public void init()
+    {
+        this.state = State.MAIN_MENU;
+        this.keyPressed_space = false;
+        this.waveCount = 1;
+        this.ballCount = BallManager.DEFAULT_BALL_COUNT;
+        this.score = 0;
+    }
 
     public void countUpWave()
     {
@@ -37,6 +47,15 @@ public class GameState
     public void setBallCount(int n)
     {
         this.ballCount = n;
+    }
+
+    public int getScore()
+    {
+        return this.score;
+    }
+    public void addScore(int n)
+    {
+        this.score += n;
     }
 
 

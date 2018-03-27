@@ -32,12 +32,26 @@ public class Block extends Sprite
         return (new RectBounds(x, y, x+WIDTH, y+HEIGHT));
     }
 
-    public void addDamage()
+    //死んだらtrue
+    public boolean addDamage()
     {
         this.life--;
         if (life <= 0) {
             this.vanish();
+            return true;
         }
+
+        return false;
+    }
+
+    public void soundPlay()
+    { }
+
+    @Override
+    public void vanish()
+    {
+        super.vanish();
+        this.soundPlay();
     }
 
     @Override

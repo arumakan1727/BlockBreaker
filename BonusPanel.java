@@ -15,6 +15,12 @@ public class BonusPanel extends Block
     }
 
     @Override
+    public void soundPlay()
+    {
+        new MP3Player(Game.url_coin, false);
+    }
+
+    @Override
     public RectBounds getBounds()
     {
         return new RectBounds(this.x, this.y, this.x+WIDTH, this.y + HEIGHT);

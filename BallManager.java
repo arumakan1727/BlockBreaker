@@ -116,8 +116,9 @@ public class BallManager
         boolean allisPreLaunchPos = true;
         final double speedEta = gameState.keyPressed_space ? SCALE_KEY_PRESSED_SPEED : 1.0;
 
-        for (Ball v : balls)
+        for (int i=0; i < balls.size(); ++i)
         {
+            final Ball v = balls.get(i);
             if (v.isLanded()) //地面についているとき
             {
                 if (!anyLanded) { //まだ誰も着地していない時
@@ -130,7 +131,8 @@ public class BallManager
                 moveToPreLaunchPos(v);
             }
             else {
-                colideJudge(v);
+                int cnt = colideJudge(v);
+                gameState.addScore(cnt * 100);
             }
             allisPreLaunchPos &= v.isPrepareLaunchPos();
             v.update(speedEta);
@@ -138,7 +140,7 @@ public class BallManager
 
         // すべてのボールが発射位置についたか
         if (allisPreLaunchPos) {
-            System.out.println("allisPreLaunchPos.");
+            System.out.println("all is PreLaunchPos.");
             gameState.state = GameState.State.BLOCK_DOWN;
             addNewBall(num_newBall);
             num_newBall = 0;
@@ -153,7 +155,6 @@ public class BallManager
             v.setVx(0); // 止める
             v.setisPrepareLaunchPos(true);
         } else {
-            // TODO: 発射場所へ水平移動
             if ((int)v.getX() < preLaunchPos.x) { //定位置よりも左にある
                 v.setVx(Ball.SPEED_ARRANGEMENT);
             } else {
@@ -162,8 +163,11 @@ public class BallManager
         }
     }
 
-    private void colideJudge(final Ball v)
+    // 壊したブロックの数
+    private int colideJudge(final Ball v)
     {
+        int breakeCount = 0;
+
         RectBounds.CornerCollisionState corner = new RectBounds.CornerCollisionState();
         Iterator<Block> it = blocks.iterator();
         final RectBounds ballBounds = v.getBounds();
@@ -173,22 +177,25 @@ public class BallManager
             final RectBounds blockBounds = b.getBounds();
             if (ballBounds.collision(blockBounds)) {
                 if (b instanceof BonusPanel) {
-                    // TODO: ボールが増える
                     num_newBall++;
                     b.vanish();
+                    breakeCount += 2;
                 }
                 else {
                     corner.orAll(RectBounds.getCornerCollisionState(ballBounds, blockBounds));
-                    b.addDamage();
+                    if (b.addDamage()) {
+                        breakeCount++;
+                    }
                 }
             }
         }
         checkHitBlock(v, corner);
+        return breakeCount;
     }
 
     private void onHitBlock(Ball v, RectBounds.Location location)
     {
-        System.out.println("ball location: " + location);
+        System.out.println("ball hit location: " + location);
         switch (location) {
             case RIGHT:
             case LEFT:

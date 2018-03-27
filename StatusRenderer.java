@@ -19,8 +19,11 @@ public class StatusRenderer
     private static final int HEIGHT = Game.HEIGHT + 40;
     private static final int BOTTOM_Y_STRING_WAVE = 30;
     private static final int BOTTOM_Y_STRING_BALL = 160;
+    private static final int BOTTOM_Y_STRING_SCORE = 290;
 
-    public StatusRenderer() {}
+    public StatusRenderer() {
+        init();
+    }
 
     public void init()
     {
@@ -33,8 +36,10 @@ public class StatusRenderer
     {
         g2d.drawImage(img, Game.STATUS_PANEL_X, 0, WIDTH, HEIGHT, null);
 
-        RenderingHints  defaultReeringHints = g2d.getRenderingHints();
+        final RenderingHints  defaultRenderingHints = g2d.getRenderingHints();
+        final Font defaultFont = g2d.getFont();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
         g2d.setColor(Color.WHITE);
 
         {
@@ -62,8 +67,20 @@ public class StatusRenderer
             final int y = BOTTOM_Y_STRING_BALL + metrics.getAscent() + 10;
             g2d.drawString(S, x, y);
         }
+        {
+            g2d.setFont(new Font(Font.MONOSPACED, Font.BOLD, 24));
+            g2d.drawString("SCORE:", Game.STATUS_PANEL_X + 20, BOTTOM_Y_STRING_SCORE);
 
-        g2d.setRenderingHints(defaultReeringHints);
+            g2d.setFont(new Font(Font.MONOSPACED, Font.BOLD, 40));
+            String S = String.valueOf(score);
+            FontMetrics metrics = g2d.getFontMetrics();
+            Rectangle rect = metrics.getStringBounds(S, g2d).getBounds();
+            final int x = Game.STATUS_PANEL_X + (WIDTH / 2) - (rect.width / 2);
+            final int y = BOTTOM_Y_STRING_SCORE + metrics.getAscent() + 10;
+            g2d.drawString(S, x, y);
+        }
+        g2d.setRenderingHints(defaultRenderingHints);
+        g2d.setFont(defaultFont);
     }
 
     public int getBallCount()

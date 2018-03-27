@@ -22,7 +22,7 @@ public class BlockManager
     private static final int NUM_BLOCK_VERTICAL = 5;
     private static final int DEFAULT_BLOCK_DOWN_SPEED = 5;
     private static final double VALUE_DOWN_SPEED_SLOW = 0.33;
-    private static final int BONUS_PROBABILITY = 50;
+    private static final int BONUS_PROBABILITY = 64;
     private static final int NUM_VOID = 3;
 
     private final static BufferedImage img_blocks[] = new BufferedImage[NUM_BLOCK_COLOR];
@@ -40,7 +40,7 @@ public class BlockManager
         }
         ImageEffect.addRGB(img_blocks[0], 180, 0, 0);
         ImageEffect.addRGB(img_blocks[1], 0, 180, 0);
-        ImageEffect.addRGB(img_blocks[2], 0, 0, 180);
+        ImageEffect.addRGB(img_blocks[2], 0, 0, 220);
         ImageEffect.addRGB(img_blocks[3], 150, 150, -20);
 
         init();
@@ -87,13 +87,18 @@ public class BlockManager
             gameState.state = GameState.State.CLICK_WAIT;
             blocks.addAll(createHorizontalHideArray(calcNUM_VOID(), gameState.getBallCount()));
             gameState.countUpWave();
+            gameState.addScore( (gameState.getWaveCount() % 10  == 0) ?
+                    300 : (gameState.getWaveCount() % 5 == 0) ?
+                    100 : 50);
         }
         else {
-            for (Block e : blocks) {
+            for (int i = 0; i < blocks.size(); i++) {
+                final Block e = blocks.get(i);
                 e.addY(blockDownSpeed);
                 // 床に触れたらゲームオーバー
                 if (!(e instanceof BonusPanel) && e.getY() + Block.HEIGHT > Game.FLOOR_Y) {
                     gameState.state = GameState.State.GAMEOVER;
+                    new MP3Player(Game.url_explosion, false);
                     return gameState;
                 }
             }
@@ -104,7 +109,7 @@ public class BlockManager
 
     private int calcNUM_VOID()
     {
-        return NUM_VOID + new Random().nextInt(1);
+        return NUM_VOID + ((new Random().nextInt(10) < 2) ? 1 : 0);
     }
 
     private List<Block> createHorizontalHideArray(int num_void, int ballCount)
@@ -148,7 +153,7 @@ public class BlockManager
             }
             else {
                 int x = OFFSET_X + i * (Block.WIDTH + MARGIN_X);
-                int HP = 1 + ballCount + rand.nextInt((int)(0.8 * ballCount));
+                int HP = 1 + ballCount + rand.nextInt(ballCount);
                 list.add(new Block(img_blocks[rand.nextInt(NUM_BLOCK_COLOR)], x, y, HP));
             }
         }
