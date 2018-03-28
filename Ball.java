@@ -17,11 +17,6 @@ public class Ball extends Sprite
     private int delay;
     private boolean isPrepareLaunchPos;
 
-    public Ball(final BufferedImage img)
-    {
-        this(img, 0, 0);
-    }
-
     public Ball(final BufferedImage img, Point p)
     {
         this(img, p.x, p.y);
@@ -50,7 +45,7 @@ public class Ball extends Sprite
 
     public RectBounds getBounds()
     {
-        return (new RectBounds(x+2, y+2, x+SIZE-2, y+SIZE-2));
+        return (new RectBounds(x+1, y, x+SIZE-1, y+SIZE));
     }
 
     public void setVx(double vx)
@@ -83,9 +78,6 @@ public class Ball extends Sprite
         vy = -vy;
     }
 
-    public int getDelay() {
-        return this.delay;
-    }
     public void setDelay(int delay) {
         this.delay = delay;
     }

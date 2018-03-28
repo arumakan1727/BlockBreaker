@@ -43,7 +43,7 @@ public class BlockManager
         ImageEffect.addRGB(img_blocks[2], 0, 0, 220);
         ImageEffect.addRGB(img_blocks[3], 150, 150, -20);
 
-        init();
+//        init();
     }
 
     public void init()
@@ -56,8 +56,8 @@ public class BlockManager
         }
         blocks.addAll(createHorizontalHideArray(calcNUM_VOID(), BallManager.DEFAULT_BALL_COUNT));
         blockDownSpeed = DEFAULT_BLOCK_DOWN_SPEED;
-        delay = 20;
-        System.out.println("BlockManager#init : blocks_size = " + blocks.size());
+        delay = 15;
+        System.out.println("init() BlockManager : num_blocks_count = " + blocks.size());
     }
 
     public GameState update(GameState gameState)

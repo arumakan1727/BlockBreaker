@@ -40,6 +40,7 @@ public class SessionRenderer
         this.delay = DELAY;
         this.text_y = TEXT_Y;
         this.isText_y_up = false;
+        System.out.println("init() SessionRenderer");
     }
 
     public GameState update(GameState gameState)
@@ -106,14 +107,14 @@ public class SessionRenderer
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         {
-            g2d.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 24));
-            g2d.drawString("Click to MAIN-MENU...", 370, 510);
+            g2d.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 22));
+            g2d.drawString("Click to MAIN-MENU...", 420, 520);
 
             {
-                final String S = "Your SCORE";
+                final String S = "YOUR SCORE";
                 g2d.setFont(new Font(Font.MONOSPACED, Font.BOLD, 30));
                 Rectangle rect = g2d.getFontMetrics().getStringBounds(S, g2d).getBounds();
-                g2d.drawString(S, Game.WIDTH / 2 - rect.width / 2, 380);
+                g2d.drawString(S, Game.WIDTH / 2 - rect.width / 2, 370);
             }
             {
                 final String S = String.valueOf(score);

@@ -32,7 +32,7 @@ public class BallManager
         img_ball = src;
         this.blocks = list;
         this.balls = new ArrayList<>();
-        this.init();
+//        this.init();
     }
 
     public void init()
@@ -43,6 +43,7 @@ public class BallManager
         for (int i = 0; i < DEFAULT_BALL_COUNT; i++) {
             balls.add(new Ball(img_ball, DEFAULT_START_POS));
         }
+        System.out.println("init() BallManager");
     }
 
     public int getBallCount()
@@ -195,7 +196,7 @@ public class BallManager
 
     private void onHitBlock(Ball v, RectBounds.Location location)
     {
-        System.out.println("ball hit location: " + location);
+//        System.out.println("ball hit location: " + location);
         switch (location) {
             case RIGHT:
             case LEFT:

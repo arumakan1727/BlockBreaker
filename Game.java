@@ -29,13 +29,15 @@ public class Game implements GameProcess
     public static final URL url_menuMP3, url_mainGameMP3, url_explosion, url_coin;
     private static final String RESOURCE = "/myGame/resources/";
 
-    private GameState gameState;
-
     private final Component     screen;
     private final BlockManager  blockManager;
     private final BallManager   ballManager;
-    private final StatusRenderer statusRenderer;
+    private final ScoreRenderer scoreRenderer;
     private final SessionRenderer sessionRenderer;
+
+    private GameState gameState;
+    private static final int RUNCHECK_INTERVAL = 120;
+    private int runChecker = RUNCHECK_INTERVAL;
 
     private MP3Player mp3Menu, mp3mainGame;
 
@@ -67,7 +69,7 @@ public class Game implements GameProcess
         this.screen = (Component) renderer;
         this.blockManager = new BlockManager(img_block);
         this.ballManager = new BallManager(img_ball, blockManager.getBlocks());
-        this.statusRenderer = new StatusRenderer();
+        this.scoreRenderer = new ScoreRenderer();
         this.sessionRenderer = new SessionRenderer();
 
         this.eventListenInit(this.screen);
@@ -90,7 +92,7 @@ public class Game implements GameProcess
         gameState.init();
         ballManager.init();
         blockManager.init();
-        statusRenderer.init();
+        scoreRenderer.init();
         sessionRenderer.init();
         System.out.println("Game#initialied()   state: " + gameState.state);
         mp3Menu = new MP3Player(url_menuMP3, true);
@@ -102,9 +104,9 @@ public class Game implements GameProcess
         this.gameState = ballManager.update(this.gameState);
         this.gameState = blockManager.update(this.gameState);
 
-        this.statusRenderer.setWaveCount(gameState.getWaveCount());
-        this.statusRenderer.setBallCount( ballManager.getBallCount() );
-        this.statusRenderer.setScore(gameState.getScore());
+        this.scoreRenderer.setWaveCount(gameState.getWaveCount());
+        this.scoreRenderer.setBallCount( ballManager.getBallCount() );
+        this.scoreRenderer.setScore(gameState.getScore());
         this.gameState.setBallCount(ballManager.getBallCount());
 
         this.sessionRenderer.update(gameState);
@@ -112,6 +114,11 @@ public class Game implements GameProcess
         if (gameState.state == GameState.State.GAMEOVER && mp3mainGame != null) {
             mp3mainGame.stop();
             mp3mainGame = null;
+        }
+
+        if (--runChecker < 0) {
+            runChecker = RUNCHECK_INTERVAL;
+            System.out.println("[RUNNING] update()" + "\tstate: " + gameState.state);
         }
     }
 
@@ -124,7 +131,7 @@ public class Game implements GameProcess
         blockManager.draw(g2d);
 
         g2d.drawImage(img_floor, 0, FLOOR_Y, null);
-        statusRenderer.draw(g2d);
+        scoreRenderer.draw(g2d);
 
         switch (gameState.state) {
             case MAIN_MENU:
@@ -134,6 +141,11 @@ public class Game implements GameProcess
             case RETURNABLE_TO_MENU:
                 sessionRenderer.draw(g2d, gameState);
                 break;
+        }
+
+        if (--runChecker < 0) {
+            runChecker = RUNCHECK_INTERVAL;
+            System.out.println("[RUNNING] render()");
         }
     }
 
@@ -174,7 +186,7 @@ public class Game implements GameProcess
                     case RETURNABLE_TO_MENU:
                         gameState.state = GameState.State.MAIN_MENU;
                         initialize();
-                        System.gc();
+//                        System.gc();
                         break;
                 }
             }

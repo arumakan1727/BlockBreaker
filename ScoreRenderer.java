@@ -8,7 +8,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-public class StatusRenderer
+public class ScoreRenderer
 {
     private int ballCount;
     private int waveCount;
@@ -21,7 +21,7 @@ public class StatusRenderer
     private static final int BOTTOM_Y_STRING_BALL = 160;
     private static final int BOTTOM_Y_STRING_SCORE = 290;
 
-    public StatusRenderer() {
+    public ScoreRenderer() {
         init();
     }
 
@@ -30,6 +30,7 @@ public class StatusRenderer
         ballCount = 0;
         waveCount = 1;
         score = 0;
+        System.out.println("init() ScoreRenderer");
     }
 
     public void draw(Graphics2D g2d)
@@ -103,10 +104,6 @@ public class StatusRenderer
         this.waveCount = waveCount;
     }
 
-    public void waveCountUp()
-    {
-        this.waveCount++;
-    }
 
     public int getScore()
     {
@@ -118,8 +115,4 @@ public class StatusRenderer
         this.score = score;
     }
 
-    public void addScore(int value)
-    {
-        this.score += value;
-    }
 }

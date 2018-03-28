@@ -45,7 +45,7 @@ public class MP3Player
                 pthread = new PlayThread();
                 pthread.start();
             }
-            System.out.println("!!!  Music-playbackFinished");
+            System.out.println("Music-playbackFinished: " + soundUrl);
         }
     }
 
