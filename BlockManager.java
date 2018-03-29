@@ -43,7 +43,6 @@ public class BlockManager
         ImageEffect.addRGB(img_blocks[2], 0, 0, 220);
         ImageEffect.addRGB(img_blocks[3], 150, 150, -20);
 
-//        init();
     }
 
     public void init()
@@ -107,6 +106,7 @@ public class BlockManager
         return gameState;
     }
 
+    // 空白のブロックの数を生成
     private int calcNUM_VOID()
     {
         return NUM_VOID + ((new Random().nextInt(10) < 2) ? 1 : 0);

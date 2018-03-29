@@ -14,13 +14,11 @@ import static java.lang.Math.abs;
 public class BallManager
 {
     // static
-//    public static final Point DEFAULT_START_POS
-//            = new Point(Game.WIDTH / 2, Game.FLOOR_Y - Ball.SIZE);    //ボールの左上の座標
     public static final int DEFAULT_START_POS_X = Game.STATUS_PANEL_X / 2;
     public static final int DEFAULT_START_POS_Y = Game.FLOOR_Y - Ball.SIZE;
     public static final int DEFAULT_BALL_COUNT = 3;
     private static BufferedImage img_ball;
-    private static final double SCALE_KEY_PRESSED_SPEED = 1.6;
+    private static final double SCALE_KEY_PRESSED_SPEED = 1.8;
 
     private final List<Ball> balls;
 

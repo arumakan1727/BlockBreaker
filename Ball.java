@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 
 public class Ball extends Sprite
 {
-    public static final int SIZE = 18;
+    public static final int SIZE = 16;
     public static final double SPEED_FLY = 8;
     public static final double SPEED_ARRANGEMENT = 5;
 
@@ -16,6 +16,7 @@ public class Ball extends Sprite
     private double vx, vy;  //speed
     private int delay;
     private boolean isPrepareLaunchPos;
+    private boolean landed;
 
     public Ball(final BufferedImage img, Point p)
     {
@@ -39,13 +40,6 @@ public class Ball extends Sprite
     public void setLanded(boolean landed)
     {
         this.landed = landed;
-    }
-
-    private boolean landed;
-
-    public RectBounds getBounds()
-    {
-        return (new RectBounds(x+1, y-1, x+SIZE-1, y+SIZE+1));
     }
 
     public void setVx(double vx)
@@ -117,10 +111,16 @@ public class Ball extends Sprite
 
     }
 
+    public RectBounds getBounds()
+    {
+        return (new RectBounds(x, y-1, x+SIZE, y+SIZE+1));
+    }
+
     @Override
     public void draw(Graphics2D g2d)
     {
         g2d.drawImage(img, (int)x, (int)y, null);
+        g2d.setColor(java.awt.Color.RED);
     }
 
     public boolean isPrepareLaunchPos()
