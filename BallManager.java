@@ -14,8 +14,10 @@ import static java.lang.Math.abs;
 public class BallManager
 {
     // static
-    public static final Point DEFAULT_START_POS
-            = new Point(Game.WIDTH / 2, Game.FLOOR_Y - Ball.SIZE);    //ボールの左上の座標
+//    public static final Point DEFAULT_START_POS
+//            = new Point(Game.WIDTH / 2, Game.FLOOR_Y - Ball.SIZE);    //ボールの左上の座標
+    public static final int DEFAULT_START_POS_X = Game.STATUS_PANEL_X / 2;
+    public static final int DEFAULT_START_POS_Y = Game.FLOOR_Y - Ball.SIZE;
     public static final int DEFAULT_BALL_COUNT = 3;
     private static BufferedImage img_ball;
     private static final double SCALE_KEY_PRESSED_SPEED = 1.6;
@@ -32,16 +34,20 @@ public class BallManager
         img_ball = src;
         this.blocks = list;
         this.balls = new ArrayList<>();
-//        this.init();
+        this.preLaunchPos = new Point(DEFAULT_START_POS_X, DEFAULT_START_POS_Y);
     }
 
     public void init()
     {
+        //ボール配列を初期化
         balls.clear();
         num_newBall = 0;
-        this.preLaunchPos = DEFAULT_START_POS;
+        //初期発射位置
+        this.preLaunchPos.x = DEFAULT_START_POS_X;
+        this.preLaunchPos.y = DEFAULT_START_POS_Y;
+
         for (int i = 0; i < DEFAULT_BALL_COUNT; i++) {
-            balls.add(new Ball(img_ball, DEFAULT_START_POS));
+            balls.add(new Ball(img_ball, DEFAULT_START_POS_X, DEFAULT_START_POS_Y));
         }
         System.out.println("init() BallManager");
     }
@@ -60,17 +66,12 @@ public class BallManager
     public GameState update(GameState gameState)
     {
         switch (gameState.state) {
-            case MAIN_MENU:
-                break;
             case NOW_CLICKED:
                 prepareLaunch(gameState);
                 gameState.state = GameState.State.BALL_FLYING;
                 break;
             case BALL_FLYING:
                 gameState =  ballMove(gameState);
-                break;
-            case CLICK_WAIT:
-            case BLOCK_DOWN:
                 break;
         }
         return gameState;
@@ -90,14 +91,17 @@ public class BallManager
         final double rad = Math.atan2(nextY - preLaunchPos.y,
                 nextX - preLaunchPos.x);
 
-        final double vx = Ball.SPEED_FLY * Math.cos(rad); // x 方向の速度
+        // x方向の速度
+        final double vx = Ball.SPEED_FLY * Math.cos(rad);
+        // y方向の速度
         final double vy = Ball.SPEED_FLY * Math.sin(rad);
 
         for (int i = 0; i < balls.size(); i++) {
             Ball b = balls.get(i);
             b.setDelay(i * 8);
             b.setLanded(false);
-            b.setVx(vx); //速度設定
+            //速度設定
+            b.setVx(vx);
             b.setVy(vy);
             b.setisPrepareLaunchPos(false);
         }

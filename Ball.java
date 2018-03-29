@@ -45,7 +45,7 @@ public class Ball extends Sprite
 
     public RectBounds getBounds()
     {
-        return (new RectBounds(x+1, y, x+SIZE-1, y+SIZE));
+        return (new RectBounds(x+1, y-1, x+SIZE-1, y+SIZE+1));
     }
 
     public void setVx(double vx)
@@ -96,8 +96,13 @@ public class Ball extends Sprite
         // 飛んでいる場合はhogehoge処理
         if (!landed) {
             // 画面の縁に触れたなら向きを反転
-            if ((x < 0) || (x + SIZE > Game.STATUS_PANEL_X)) {
+            if ((x < 0)) {
                 vx = -vx;
+                x = 1;
+            }
+            else if (x + SIZE > Game.STATUS_PANEL_X) {
+                vx = -vx;
+                x = Game.STATUS_PANEL_X - SIZE - 1;
             }
             if (y < 0) {
                 vy = -vy;

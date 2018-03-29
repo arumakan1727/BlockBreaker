@@ -112,9 +112,10 @@ public class BlockManager
         return NUM_VOID + ((new Random().nextInt(10) < 2) ? 1 : 0);
     }
 
+    // 上部の目に見えないところのブロックを生成
     private List<Block> createHorizontalHideArray(int num_void, int ballCount)
     {
-        return createHorizontalBlockArray(-1*Block.HEIGHT - OFFSET_Y+2, num_void, BONUS_PROBABILITY, ballCount);
+        return createHorizontalBlockArray(-1*Block.HEIGHT - OFFSET_Y+2, calcNUM_VOID(), BONUS_PROBABILITY, ballCount);
     }
 
     private List<Block> createHorizontalBlockArray(int y, int num_void, int bonusProbab, int ballCount)
