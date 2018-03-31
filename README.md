@@ -4,7 +4,7 @@
 [JavaZoom JLayer](http://www.javazoom.net/javalayer/javalayer.html)の  
 2つのライブラリが必要です。  
   
-**遊ぶだけなら[GoogleDrive - BlockBreaker](https://drive.google.com/drive/folders/1AhSj_6C2qSZOUIXvUcOhTbOGNUFpsngc?usp=sharing)
+**遊ぶだけなら[GoogleDrive - BlockBreaker](https://drive.google.com/file/d/1Cy4x--MJrAAa2x6X4YEClxCf77-pafcU/view?usp=sharing)
 の方をダウンロードしてください。**
 
 ![Screenshot](https://user-images.githubusercontent.com/33191176/38160887-69fb2e30-34ff-11e8-8a68-d6b9a2239be4.png)
