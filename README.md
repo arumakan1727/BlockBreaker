@@ -7,6 +7,7 @@
 **遊ぶだけなら[GoogleDrive - BlockBreaker](https://drive.google.com/drive/folders/1AhSj_6C2qSZOUIXvUcOhTbOGNUFpsngc?usp=sharing)
 の方をダウンロードしてください。**
 
+![Screenshot](https://user-images.githubusercontent.com/33191176/38160887-69fb2e30-34ff-11e8-8a68-d6b9a2239be4.png)
 
 * バージョン -- 1.0  
 * 作者名 -- YDK_NK  
@@ -76,13 +77,13 @@
   MP3ファイルの再生にJavaZoom様のJLayerライブラリを使用させていただきました。  
   音楽素材は「魔王魂」様,「Music-Note.jp」からお借りしています。  
   画像素材の一部は「写真AC」様, 「GATAG」様からお借りしています。  
-  この場を借りて感謝申し上げます。  
-    * JavaZoom JLayer ----  http://www.javazoom.net/javalayer/javalayer.html  
-    * 魔王魂          ----  https://maoudamashii.jokersounds.com/  
-    * Music-Note.jp   ----  http://www.music-note.jp/  
-          (Music-Note.jpの運営:株式会社ピクセル - http://pixel-co.com/)  
-    * 写真AC          ----  https://www.photo-ac.com/  
-    * GATAG フリーイラスト素材集 ---- http://free-illustrations.gatag.net/  
+  この場を借りて感謝申し上げます。
+   * JavaZoom JLayer ----  http://www.javazoom.net/javalayer/javalayer.html
+   * 魔王魂          ----  https://maoudamashii.jokersounds.com/ 
+   * Music-Note.jp   ----  http://www.music-note.jp/  
+     (Music-Note.jpの運営:株式会社ピクセル - http://pixel-co.com/)  
+   * 写真AC          ----  https://www.photo-ac.com/  
+   * GATAG フリーイラスト素材集 ---- http://free-illustrations.gatag.net/  
 
 ## 既知の不具合
   * スペースキーで早送りするとボールの軌道がずれることがある。  
