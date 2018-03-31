@@ -14,18 +14,18 @@ import static java.lang.Math.abs;
 public class BallManager
 {
     // static
-    public static final int DEFAULT_START_POS_X = Game.STATUS_PANEL_X / 2;
-    public static final int DEFAULT_START_POS_Y = Game.FLOOR_Y - Ball.SIZE;
-    public static final int DEFAULT_BALL_COUNT = 3;
+    public static final int DEFAULT_BALL_COUNT = 3;     //ボールの数の初期値
+    private static final int DEFAULT_START_POS_X = Game.STATUS_PANEL_X / 2;     //初期の発射位置
+    private static final int DEFAULT_START_POS_Y = Game.FLOOR_Y - Ball.SIZE;
     private static BufferedImage img_ball;
-    private static final double SCALE_KEY_PRESSED_SPEED = 1.8;
+    private static final double SCALE_KEY_PRESSED_SPEED = 1.8;  //スペースキーが押された時に何倍速にするか
 
     private final List<Ball> balls;
 
-    private Point preLaunchPos;
-    private boolean anyLanded;
-    private List<Block> blocks;
-    private int num_newBall;
+    private Point preLaunchPos; //次の発射位置
+    private boolean anyLanded;  //ボールが1つでも着地したらtrue
+    private List<Block> blocks; //当たり判定するblockのリスト
+    private int num_newBall;    //ターン終了時にリストに追加するボールの数
 
     public BallManager(BufferedImage src, List<Block> list)
     {
@@ -43,10 +43,8 @@ public class BallManager
         //初期発射位置
         this.preLaunchPos.x = DEFAULT_START_POS_X;
         this.preLaunchPos.y = DEFAULT_START_POS_Y;
-
-        for (int i = 0; i < DEFAULT_BALL_COUNT; i++) {
-            balls.add(new Ball(img_ball, DEFAULT_START_POS_X, DEFAULT_START_POS_Y));
-        }
+        // リストにボールを追加
+        addNewBall(DEFAULT_BALL_COUNT);
         System.out.println("init() BallManager");
     }
 
@@ -65,7 +63,7 @@ public class BallManager
     {
         switch (gameState.state) {
             case NOW_CLICKED:
-                prepareLaunch(gameState);
+                prepareLaunch(gameState); // ボールの発射準備(向きの設定等)
                 gameState.state = GameState.State.BALL_FLYING;
                 break;
             case BALL_FLYING:
@@ -96,7 +94,7 @@ public class BallManager
 
         for (int i = 0; i < balls.size(); i++) {
             Ball b = balls.get(i);
-            b.setDelay(i * 8);
+            b.setDelay(i * 6);
             b.setLanded(false);
             //速度設定
             b.setVx(vx);
@@ -105,11 +103,13 @@ public class BallManager
         }
     }
 
+    // ボールが発射位置についているか
     private boolean isPrepareLaunchPosision(Ball b)
     {
-        int xdiff = abs((int)b.getX() - preLaunchPos.x);
-        if (xdiff <= Ball.SPEED_ARRANGEMENT)
-            b.setX(preLaunchPos.x);
+        int xdiff = abs((int)b.getX() - preLaunchPos.x); //x方向のズレの距離
+        if (xdiff <= Ball.SPEED_ARRANGEMENT) {
+            b.setX(preLaunchPos.x); // 距離が近いなら強制的に移動
+        }
         return (int)b.getX() == preLaunchPos.x && (int)b.getY() == preLaunchPos.y;
     }
 
@@ -166,10 +166,11 @@ public class BallManager
         }
     }
 
-    // 壊したブロックの数
+    // 壊したブロックの数を返す
     private int colideJudge(final Ball v)
     {
-        int breakeCount = 0;
+        //壊した数(スター:+2,  ブロック:+1)
+        int breakCount = 0;
 
         RectBounds.CornerCollisionState corner = new RectBounds.CornerCollisionState();
         Iterator<Block> it = blocks.iterator();
@@ -177,28 +178,30 @@ public class BallManager
 
         while (it.hasNext()) {
             Block b = it.next();
+            //block の当たり判定矩形を取得
             final RectBounds blockBounds = b.getBounds();
             if (ballBounds.collision(blockBounds)) {
                 if (b instanceof BonusPanel) {
                     num_newBall++;
                     b.vanish();
-                    breakeCount += 2;
+                    breakCount += 2;
                 }
                 else {
+                    // ボールの四隅のフラグにORをとる
                     corner.orAll(RectBounds.getCornerCollisionState(ballBounds, blockBounds));
-                    if (b.addDamage()) {
-                        breakeCount++;
+                    if (b.addDamage()) { //もし破壊したら
+                        breakCount++;
                     }
                 }
             }
         }
+        //ボールの反射方向を計算,設定
         checkHitBlock(v, corner);
-        return breakeCount;
+        return breakCount;
     }
 
     private void onHitBlock(Ball v, RectBounds.Location location)
     {
-//        System.out.println("ball hit location: " + location);
         switch (location) {
             case RIGHT:
             case LEFT:
@@ -227,6 +230,7 @@ public class BallManager
                 v.setVy(abs(v.getVy()));
                 break;
         }
+        // ボールが貫通しないように移動させる
         v.update(1);
     }
 

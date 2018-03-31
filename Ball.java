@@ -8,15 +8,15 @@ import java.awt.image.BufferedImage;
 
 public class Ball extends Sprite
 {
-    public static final int SIZE = 16;
-    public static final double SPEED_FLY = 8;
-    public static final double SPEED_ARRANGEMENT = 5;
+    public static final int SIZE = 16; //ボールの大きさ(縦,横同じサイズ)
+    public static final double SPEED_FLY = 8; //飛ぶ時の速さ
+    public static final double SPEED_ARRANGEMENT = 5;//発射場所へ戻る速さ
 
     private final BufferedImage img;
     private double vx, vy;  //speed
-    private int delay;
-    private boolean isPrepareLaunchPos;
-    private boolean landed;
+    private int delay; //クリックされてから発射するまでの時間
+    private boolean isPrepareLaunchPos; //発射位置についたか
+    private boolean landed;//地面についたか
 
     public Ball(final BufferedImage img, Point p)
     {
@@ -77,7 +77,7 @@ public class Ball extends Sprite
     }
 
     @Override
-    public void update(double eta)
+    public void update(double eta) //etaはスペースキーが押されているかで変わる早送りの定数
     {
         if (this.delay > 0) {
             this.delay--;

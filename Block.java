@@ -27,12 +27,13 @@ public class Block extends Sprite
         this.life = life;
     }
 
+    //当たり判定矩形を返す
     public RectBounds getBounds()
     {
         return (new RectBounds(x, y, x+WIDTH, y+HEIGHT));
     }
 
-    //死んだらtrue
+    //死んだらtrueを返す
     public boolean addDamage()
     {
         this.life--;
@@ -44,6 +45,7 @@ public class Block extends Sprite
         return false;
     }
 
+    // 音を鳴らす(現在は鳴らさない仕様)
     public void soundPlay()
     { }
 

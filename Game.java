@@ -19,10 +19,10 @@ import java.net.URL;
 
 public class Game implements GameProcess
 {
-    public static final int WIDTH   = 720;
+    public static final int WIDTH   = 720;      // ウィンドウサイズ
     public static final int HEIGHT  = 540;
-    public static final int FLOOR_Y = HEIGHT - 30;
-    public static final int STATUS_PANEL_X = 520;
+    public static final int FLOOR_Y = HEIGHT - 30;  //床の座標
+    public static final int STATUS_PANEL_X = 520;   //ステータスパネルの座標
     public static BufferedImage
             img_ball, img_block, img_bonusPanel, img_hexagonBack, img_floor, img_glossPanel,
             img_gameover, img_logo;
@@ -62,6 +62,11 @@ public class Game implements GameProcess
         url_coin        = Game.class.getResource(RESOURCE + "coin.MP3");
     }
 
+    public static void main(String[] args)
+    {
+        new Game(new GamePanel(WIDTH, HEIGHT));
+    }
+
     private Game(final BufferingRenderer renderer)
     {
         this.gameState = new GameState();
@@ -72,6 +77,7 @@ public class Game implements GameProcess
         this.scoreRenderer = new ScoreRenderer();
         this.sessionRenderer = new SessionRenderer();
 
+        // マウスやキーのイベントリスナーの設定
         this.eventListenInit(this.screen);
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -88,14 +94,14 @@ public class Game implements GameProcess
     @Override
     public void initialize()
     {
-//        gameState.state = GameState.State.CLICK_WAIT;
         gameState.init();
         ballManager.init();
         blockManager.init();
         scoreRenderer.init();
         sessionRenderer.init();
         System.out.println("Game#initialied()   state: " + gameState.state);
-        mp3Menu = new MP3Player(url_menuMP3, true);
+
+        mp3Menu = new MP3Player(url_menuMP3, true); //タイトル画面の時のBGMをループ再生(別スレッド)
     }
 
     @Override
@@ -104,18 +110,22 @@ public class Game implements GameProcess
         this.gameState = ballManager.update(this.gameState);
         this.gameState = blockManager.update(this.gameState);
 
+        //スscoreRenderer(テータスパネル描画)のターン数やボール数,スコアを更新
         this.scoreRenderer.setWaveCount(gameState.getWaveCount());
         this.scoreRenderer.setBallCount( ballManager.getBallCount() );
         this.scoreRenderer.setScore(gameState.getScore());
+        // gameStateのボール数を更新
         this.gameState.setBallCount(ballManager.getBallCount());
 
         this.sessionRenderer.update(gameState);
 
+        // もしGameOverでBGMがまだなっていたら止める
         if (gameState.state == GameState.State.GAMEOVER && mp3mainGame != null) {
             mp3mainGame.stop();
             mp3mainGame = null;
         }
 
+        //デバック用
         if (--runChecker < 0) {
             runChecker = RUNCHECK_INTERVAL;
             System.out.println("[RUNNING] update()" + "\tstate: " + gameState.state);
@@ -125,7 +135,6 @@ public class Game implements GameProcess
     @Override
     public void render(Graphics2D g2d)
     {
-
         g2d.drawImage(img_hexagonBack, 0, 0, null);
         ballManager.draw(g2d);
         blockManager.draw(g2d);
@@ -135,23 +144,17 @@ public class Game implements GameProcess
 
         switch (gameState.state) {
             case MAIN_MENU:
-                sessionRenderer.draw(g2d, gameState);
-                break;
             case GAMEOVER:
             case RETURNABLE_TO_MENU:
                 sessionRenderer.draw(g2d, gameState);
                 break;
         }
 
+        //デバック用
         if (--runChecker < 0) {
             runChecker = RUNCHECK_INTERVAL;
             System.out.println("[RUNNING] render()");
         }
-    }
-
-    public static void main(String[] args)
-    {
-        new Game(new GamePanel(WIDTH, HEIGHT));
     }
 
     private void eventListenInit(Component screen)
@@ -166,13 +169,17 @@ public class Game implements GameProcess
                 Game.this.screen.requestFocus();
 
                 switch (gameState.state) {
+                    // タイトル画面でクリックされたらBGMを変更し,gameStateを変える
                     case MAIN_MENU:
                         gameState.state = GameState.State.CLICK_WAIT;
-                        if (mp3Menu != null) mp3Menu.stop();
+                        if (mp3Menu != null) {
+                            mp3Menu.stop();
+                        }
                         mp3mainGame = new MP3Player(url_mainGameMP3, true);
                         break;
-
+                    // クリック待ち状態でクリックされた
                     case CLICK_WAIT:
+                        //ボタン,クリック位置の判定
                         if ( (ev.getButton() == MouseEvent.BUTTON1)
                                 && ev.getY() < FLOOR_Y - (Ball.SIZE + 25)
                                 && ev.getX() < STATUS_PANEL_X)
@@ -183,15 +190,16 @@ public class Game implements GameProcess
                         }
                         break;
 
+                    // GameOverの後
                     case RETURNABLE_TO_MENU:
                         gameState.state = GameState.State.MAIN_MENU;
                         initialize();
-//                        System.gc();
                         break;
                 }
             }
         });
 
+        // スペースキーが押されたか
         this.screen.addKeyListener(new KeyAdapter()
         {
             @Override

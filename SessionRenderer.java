@@ -10,16 +10,18 @@ import java.awt.RenderingHints;
 
 public class SessionRenderer
 {
-    private static final double DEFAULT_OPACITY = 0.2;
-    private static final int FIRST_IMG_Y = -80;
-    private static final int LAST_IMG_Y = -55;
-    private static final double IMG_VY = 0.2;
-    private static final double FADE_IN_SPEED = 0.008;
-    private static final int DELAY = 70;
-    private static final int TEXT_Y = 460;
-    private static final int MIN_TOP_TXET_Y = 455;
-    private static final int MAX_BOTTOM_TEXT_Y = TEXT_Y;
-    private static final double VAULE_TEXT_Y_ADD = 0.2;
+    //GameOverの画像についてのhogehoge
+    private static final double DEFAULT_OPACITY = 0.2; //フェードインの最初の透明度(0に近いほど透明)
+    private static final double FADE_IN_SPEED = 0.008; //不透明担っていく定数
+    private static final int FIRST_IMG_Y = -80; //フェードインの最初のy座標
+    private static final int END_IMG_Y = -55;  //フェードインの最後のy座標
+    private static final double IMG_VY = 0.2;   //フェードインの下へ降りてくる速さ
+    private static final int DELAY = 70;    //フェードインが終わった後の間
+    private static final int TEXT_Y = 460;  //"YOUR SCORE"の下のy座標
+    //タイトル画面の揺れる文字についてのhogehoge
+    private static final int MIN_TOP_TXET_Y = 455;  //上
+    private static final int MAX_BOTTOM_TEXT_Y = TEXT_Y; //下
+    private static final double VAULE_TEXT_Y_ADD = 0.2; //揺れる速さ
     private static final String TEXT_MENU = "Click to start";
 
     private double opacity;
@@ -47,18 +49,17 @@ public class SessionRenderer
     {
         switch (gameState.state) {
             case MAIN_MENU:
-                textMove();
+                textMove(); //文字を揺らす
                 break;
-
             case GAMEOVER:
-                if (img_y < LAST_IMG_Y) {
+                if (img_y < END_IMG_Y) { //画像を下へ移動しながらフェードイン
                     img_y += IMG_VY;
                     opacity += FADE_IN_SPEED;
                     if (opacity > 1.0) opacity = 1.0;
-
-                } else {
+                }
+                else { //フェードインが終わったなら
                     if (delay > 0) {
-                        --delay;
+                        --delay;    //間を空ける
                     } else {
                         System.out.println("---RETURNABLE");
                         gameState.state = GameState.State.RETURNABLE_TO_MENU;
@@ -85,6 +86,7 @@ public class SessionRenderer
         }
     }
 
+    // タイトル画面の文字列を揺らす
     private void textMove() {
         if (isText_y_up) {
             if (text_y > MIN_TOP_TXET_Y)
@@ -100,30 +102,33 @@ public class SessionRenderer
         }
     }
 
+    // フェードインが終わった後に描画する。最終的な結果を表示
     private void drawScore(Graphics2D g2d, int score)
     {
+        // 初期の設定を保存して他のクラスが描画を安全に描画できるようにする
         final Font defaultFont = g2d.getFont();
         final RenderingHints defaultRenderingHints = g2d.getRenderingHints();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        {
-            g2d.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 22));
-            g2d.drawString("Click to MAIN-MENU...", 420, 520);
+        g2d.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 22));
+        g2d.drawString("Click to MAIN-MENU...", 420, 520);
 
-            {
-                final String S = "YOUR SCORE";
-                g2d.setFont(new Font(Font.MONOSPACED, Font.BOLD, 30));
-                Rectangle rect = g2d.getFontMetrics().getStringBounds(S, g2d).getBounds();
-                g2d.drawString(S, Game.WIDTH / 2 - rect.width / 2, 370);
-            }
-            {
-                final String S = String.valueOf(score);
-                g2d.setFont(new Font(Font.MONOSPACED, Font.BOLD, 86));
-                Rectangle rect = g2d.getFontMetrics().getStringBounds(S, g2d).getBounds();
-                g2d.drawString(S, Game.WIDTH / 2 - rect.width / 2, 460);
-            }
+        // "YOUR SCORE"の描画
+        {
+            final String S = "YOUR SCORE";
+            g2d.setFont(new Font(Font.MONOSPACED, Font.BOLD, 30));
+            Rectangle rect = g2d.getFontMetrics().getStringBounds(S, g2d).getBounds();
+            g2d.drawString(S, Game.WIDTH / 2 - rect.width / 2, 370);
+        }
+        //実際のスコアの数値を描画
+        {
+            final String S = String.valueOf(score);
+            g2d.setFont(new Font(Font.MONOSPACED, Font.BOLD, 86));
+            Rectangle rect = g2d.getFontMetrics().getStringBounds(S, g2d).getBounds();
+            g2d.drawString(S, Game.WIDTH / 2 - rect.width / 2, 460);
         }
 
+        //保存しておいた初期の設定を再設定
         g2d.setRenderingHints(defaultRenderingHints);
         g2d.setFont(defaultFont);
     }
@@ -132,10 +137,12 @@ public class SessionRenderer
     {
         g2d.drawImage(Game.img_logo, 0, 0, null);
 
+        // 初期の設定を保存
         final Font defaultFont = g2d.getFont();
         final RenderingHints defaultRenderingHints = g2d.getRenderingHints();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        // 揺れる文字を描画
         {
             g2d.setFont(new Font(Font.DIALOG_INPUT, Font.BOLD, 24));
             FontMetrics metrics = g2d.getFontMetrics();
@@ -145,17 +152,21 @@ public class SessionRenderer
             g2d.drawString(TEXT_MENU, x, (int)text_y);
         }
 
+        //保存しておいた設定を再設定
         g2d.setRenderingHints(defaultRenderingHints);
         g2d.setFont(defaultFont);
     }
 
 
+    // GameOverの画像をフェードインして描画
     private void drawGameOver(Graphics2D g2d)
     {
+        // 初期の設定を保存(透明度)
+        final Composite defaultComposit =  g2d.getComposite();
+
+        // 透明にするためのインスタンスを取得
         final AlphaComposite alphaComposite
                 = AlphaComposite.getInstance( AlphaComposite.SRC_OVER, (float)this.opacity);
-
-        final Composite defaultComposit =  g2d.getComposite();
 
         g2d.setComposite(alphaComposite);
         g2d.drawImage(Game.img_gameover, 0, (int)img_y, null);

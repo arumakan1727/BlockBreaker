@@ -5,9 +5,8 @@ import java.awt.image.BufferedImage;
 
 public class BonusPanel extends Block
 {
-    // スーパークラスのフィールドとは異なる
+    // スーパークラスのフィールドを隠蔽
     public static final int WIDTH = 40;
-    public static final int DIFF_WIDTH = Block.WIDTH - BonusPanel.WIDTH;
 
     public BonusPanel(BufferedImage img, int x, int y, int life)
     {

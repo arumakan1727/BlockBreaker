@@ -4,12 +4,6 @@ public class RectBounds
 {
     private int ax, ay, bx, by;
 
-    public enum Location
-    {
-        NIL, TOP, BOTTOM, LEFT, RIGHT,
-        RIGHT_TOP, RIGHT_BOTTOM, LEFT_TOP, LEFT_BOTTOM;
-    }
-
     /**
      * 左上の座標を(ax,ay), 右下の座標を(bx,by)とする矩形を生成します。<br>
      * 右上と左下の座標位置関係を満たす必要があり, (ax < bx)かつ(ay < by)でなければなりません。
@@ -34,12 +28,14 @@ public class RectBounds
         this((int)ax, (int)ay, (int)bx, (int)by);
     }
 
+    //自分の矩形と引数の矩形が衝突してるか
     public boolean collision(RectBounds r)
     {
         return ((this.ax < r.bx) && (r.ax < this.bx)
                 && (this.ay < r.by) && (r.ay < this.by));
     }
 
+    // 矩形内に引数の座標が入るか
     public boolean containts(int x, int y)
     {
         return ((x >= ax) && (y >= ay) && (x <= bx) && (y <= by));
@@ -67,6 +63,16 @@ public class RectBounds
         return corner.whereCollisionAt();
     }
 
+    //=================================================================================================================
+
+    //どこが衝突しているかの列挙体
+    public enum Location
+    {
+        NIL, TOP, BOTTOM, LEFT, RIGHT,
+        RIGHT_TOP, RIGHT_BOTTOM, LEFT_TOP, LEFT_BOTTOM;
+    }
+
+    //4すみの衝突状態を保持するクラス
     public static class CornerCollisionState
     {
         public boolean leftTop, rightTop, leftBtm, rightBtm;
@@ -90,15 +96,16 @@ public class RectBounds
             return ("LT: "+leftTop + " RT: " + rightTop + " LB: "+leftBtm + " RB: "+rightBtm );
         }
 
+        //引数のフィールドとORをとる
         public void orAll(CornerCollisionState rhs)
         {
-//            System.out.println("[me]  " + this.toString() + "\n[rhs] " + rhs.toString());
             this.leftTop    |= rhs.leftTop;
             this.rightTop   |= rhs.rightTop;
             this.leftBtm    |= rhs.leftBtm;
             this.rightBtm   |= rhs.rightBtm;
         }
 
+        // 4隅の衝突状態によってどこが衝突しているかを返す
         public RectBounds.Location whereCollisionAt()
         {
             if (leftTop && rightTop) {  // 左上と右上がブロック内

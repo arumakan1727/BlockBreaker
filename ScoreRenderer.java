@@ -15,8 +15,9 @@ public class ScoreRenderer
     private int score;
 
     private static final BufferedImage img = Game.img_glossPanel;
-    private static final int WIDTH = (Game.WIDTH - Game.STATUS_PANEL_X) +10;
-    private static final int HEIGHT = Game.HEIGHT + 40;
+    private static final int WIDTH = (Game.WIDTH - Game.STATUS_PANEL_X) +10; //ステータスパネルの幅
+
+    private static final int HEIGHT = Game.HEIGHT + 40; //"WAVE"の文字列の下の座標
     private static final int BOTTOM_Y_STRING_WAVE = 30;
     private static final int BOTTOM_Y_STRING_BALL = 160;
     private static final int BOTTOM_Y_STRING_SCORE = 290;
@@ -37,12 +38,15 @@ public class ScoreRenderer
     {
         g2d.drawImage(img, Game.STATUS_PANEL_X, 0, WIDTH, HEIGHT, null);
 
+        // 初期の設定を保存し,他のクラスが安全な描画を出来るようにする
         final RenderingHints  defaultRenderingHints = g2d.getRenderingHints();
         final Font defaultFont = g2d.getFont();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
+
+        // 文字列の色は白
         g2d.setColor(Color.WHITE);
 
+        //WAVE数の描画
         {
             g2d.setFont(new Font(Font.MONOSPACED, Font.BOLD, 24));
             g2d.drawString("WAVE:", Game.STATUS_PANEL_X + 20, BOTTOM_Y_STRING_WAVE);
@@ -55,6 +59,7 @@ public class ScoreRenderer
             final int y = BOTTOM_Y_STRING_WAVE + metrics.getAscent() + 10;
             g2d.drawString(S, x, y);
         }
+        //BALLの数の描画
         {
             g2d.setFont(new Font(Font.MONOSPACED, Font.BOLD, 24));
             g2d.drawString("BALL  :", Game.STATUS_PANEL_X + 20, BOTTOM_Y_STRING_BALL);
@@ -68,6 +73,7 @@ public class ScoreRenderer
             final int y = BOTTOM_Y_STRING_BALL + metrics.getAscent() + 10;
             g2d.drawString(S, x, y);
         }
+        //SCOREの描画
         {
             g2d.setFont(new Font(Font.MONOSPACED, Font.BOLD, 24));
             g2d.drawString("SCORE:", Game.STATUS_PANEL_X + 20, BOTTOM_Y_STRING_SCORE);

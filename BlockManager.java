@@ -13,17 +13,17 @@ import java.util.Random;
 
 public class BlockManager
 {
-    private static final int NUM_BLOCK_COLOR = 4;
-    private static final int MARGIN_X = 3;
+    private static final int NUM_BLOCK_COLOR = 4;   //ブロックの色の種類
+    private static final int MARGIN_X = 3;          //ブロックの周りの空間
     private static final int MARGIN_Y = 3;
-    private static final int OFFSET_X = 40;
+    private static final int OFFSET_X = 40;         //ブロックのオフセット
     private static final int OFFSET_Y = 3;
-    private static final int NUM_BLOCK_HORIZONTAL = 6;
-    private static final int NUM_BLOCK_VERTICAL = 5;
-    private static final int DEFAULT_BLOCK_DOWN_SPEED = 5;
-    private static final double VALUE_DOWN_SPEED_SLOW = 0.33;
-    private static final int BONUS_PROBABILITY = 64;
-    private static final int NUM_VOID = 3;
+    private static final int NUM_BLOCK_HORIZONTAL = 6;  //横一行のブロック数
+    private static final int NUM_BLOCK_VERTICAL = 5;    //縦一列のブロック数
+    private static final int DEFAULT_BLOCK_DOWN_SPEED = 5;//ブロックが降りてくる初期のスピード
+    private static final double VALUE_DOWN_SPEED_SLOW = 0.33; //降りるスピードの減速定数
+    private static final int BONUS_PROBABILITY = 70;    //スターが1行の中に出る確率
+    private static final int NUM_VOID = 3;          //空白の数
 
     private final static BufferedImage img_blocks[] = new BufferedImage[NUM_BLOCK_COLOR];
     private final List<Block> blocks;
@@ -38,6 +38,7 @@ public class BlockManager
         for (int i = 0; i < NUM_BLOCK_COLOR; i++) {
             img_blocks[i] = ImageUtil.imageCopy(src);
         }
+        // カラフルなブロックの生成
         ImageEffect.addRGB(img_blocks[0], 180, 0, 0);
         ImageEffect.addRGB(img_blocks[1], 0, 180, 0);
         ImageEffect.addRGB(img_blocks[2], 0, 0, 220);
@@ -51,7 +52,7 @@ public class BlockManager
 
         for (int i = 0; i < NUM_BLOCK_VERTICAL; ++i) {
             int y = OFFSET_Y + i * (Block.HEIGHT + MARGIN_Y);
-            blocks.addAll(createHorizontalBlockArray(y, calcNUM_VOID(), BONUS_PROBABILITY, BallManager.DEFAULT_BALL_COUNT));
+            blocks.addAll(this.createHorizontalBlockArray(y, calcNUM_VOID(), BONUS_PROBABILITY, BallManager.DEFAULT_BALL_COUNT));
         }
         blocks.addAll(createHorizontalHideArray(calcNUM_VOID(), BallManager.DEFAULT_BALL_COUNT));
         blockDownSpeed = DEFAULT_BLOCK_DOWN_SPEED;
@@ -61,6 +62,7 @@ public class BlockManager
 
     public GameState update(GameState gameState)
     {
+        // BLOCK_DOWNの時のみ処理
         switch (gameState.state)
         {
             case BLOCK_DOWN:
@@ -80,17 +82,21 @@ public class BlockManager
             delay--;
             return gameState;
         }
+        // もしスピードが0未満になったら
         if (blockDownSpeed < 0) {
+            // 次のblockDown() に向けて初期化
             blockDownSpeed = DEFAULT_BLOCK_DOWN_SPEED;
             delay = 20;
+            //state更新,上部見えないところにブロックを作る
             gameState.state = GameState.State.CLICK_WAIT;
             blocks.addAll(createHorizontalHideArray(calcNUM_VOID(), gameState.getBallCount()));
+            // gameStateの更新
             gameState.countUpWave();
             gameState.addScore( (gameState.getWaveCount() % 10  == 0) ?
                     300 : (gameState.getWaveCount() % 5 == 0) ?
                     100 : 50);
         }
-        else {
+        else {  //まだスピードがあるなら
             for (int i = 0; i < blocks.size(); i++) {
                 final Block e = blocks.get(i);
                 e.addY(blockDownSpeed);
@@ -106,7 +112,7 @@ public class BlockManager
         return gameState;
     }
 
-    // 空白のブロックの数を生成
+    // 空白のブロックの数
     private int calcNUM_VOID()
     {
         return NUM_VOID + ((new Random().nextInt(10) < 2) ? 1 : 0);
@@ -123,10 +129,11 @@ public class BlockManager
         if (num_void > NUM_BLOCK_HORIZONTAL)
             throw new IllegalArgumentException("num_void is larger than NUM_BLOCK_HORIZONTAL");
 
+        // return用のブロックリスト
         List<Block> list = new ArrayList<>();
         Random rand = new Random();
         boolean is_void[] = new boolean[NUM_BLOCK_HORIZONTAL];
-        int bonusPos = -1;
+        int bonusPos = -1; //スターの位置(左から何番目の配列か)
 
         {
             List<Integer> voidPoslist = new ArrayList<>();
@@ -147,8 +154,8 @@ public class BlockManager
         }
         for (int i=0; i<NUM_BLOCK_HORIZONTAL; ++i) {
             if (is_void[i]) {
-                if (i == bonusPos) {
-                    int x = OFFSET_X + i * (Block.WIDTH + MARGIN_X) + BonusPanel.DIFF_WIDTH / 2;
+                if (i == bonusPos) {    // 空白で,bonusPosならスターパネルを入れる
+                    int x = OFFSET_X + i * (Block.WIDTH + MARGIN_X) + (Block.WIDTH - BonusPanel.WIDTH) / 2;
                     list.add(new BonusPanel(Game.img_bonusPanel, x, y, 1));
                 }
             }

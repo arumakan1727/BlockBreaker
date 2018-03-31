@@ -4,6 +4,7 @@ import java.awt.Point;
 
 public class GameState
 {
+    // ゲームの状態
     public enum State
     {
         MAIN_MENU,
@@ -16,12 +17,12 @@ public class GameState
     }
 
     public State state;
-    public Point mousePos = new Point();
-    public boolean keyPressed_space = false;
+    public Point mousePos = new Point(); //クリックされた位置
+    public boolean keyPressed_space = false; //スペースキーが押されていればtrue
 
-    private int waveCount;
-    private int ballCount;
-    private int score;
+    private int waveCount; //ターン数
+    private int ballCount; //ボールの数
+    private int score;     //スコア
 
     public void init()
     {

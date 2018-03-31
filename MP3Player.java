@@ -9,11 +9,12 @@ import javazoom.jl.player.advanced.AdvancedPlayer;
 import javazoom.jl.player.advanced.PlaybackEvent;
 import javazoom.jl.player.advanced.PlaybackListener;
 
+// new すれば引数のURLのサウンドを再生してくれるクラス
 public class MP3Player
 {
     private URL soundUrl;
-    private boolean isLoop;
-    private LoopPlaybackListener loopListener;
+    private boolean isLoop; //ループするならtrue
+    private LoopPlaybackListener loopListener; //再生し終わった時のイベントをlistenする用
     private PlayThread pthread;
 
     public MP3Player(URL surl, boolean loop)
