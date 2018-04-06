@@ -14,14 +14,14 @@ import java.util.Random;
 public class BlockManager
 {
     private static final int NUM_BLOCK_COLOR = 4;   //ブロックの色の種類
-    private static final int MARGIN_X = 3;          //ブロックの周りの空間
-    private static final int MARGIN_Y = 3;
+    private static final int MARGIN_X = 1;          //ブロックの周りの空間
+    private static final int MARGIN_Y = 1;          //下の空間の幅
     private static final int OFFSET_X = 40;         //ブロックのオフセット
-    private static final int OFFSET_Y = 3;
+    private static final int OFFSET_Y = 0;
     private static final int NUM_BLOCK_HORIZONTAL = 6;  //横一行のブロック数
     private static final int NUM_BLOCK_VERTICAL = 5;    //縦一列のブロック数
-    private static final int DEFAULT_BLOCK_DOWN_SPEED = 5;//ブロックが降りてくる初期のスピード
-    private static final double VALUE_DOWN_SPEED_SLOW = 0.33; //降りるスピードの減速定数
+    private static final double DEFAULT_BLOCK_DOWN_SPEED = 4.2;//ブロックが降りてくる初期のスピード
+    private static final double VALUE_DOWN_SPEED_SLOW = 0.22; //降りるスピードの減速定数
     private static final int BONUS_PROBABILITY = 70;    //スターが1行の中に出る確率
     private static final int NUM_VOID = 3;          //空白の数
 
@@ -30,6 +30,7 @@ public class BlockManager
 
     private double blockDownSpeed;
     private int delay;
+    private double movedDist;
 
     public BlockManager(BufferedImage src)
     {
@@ -52,11 +53,14 @@ public class BlockManager
 
         for (int i = 0; i < NUM_BLOCK_VERTICAL; ++i) {
             int y = OFFSET_Y + i * (Block.HEIGHT + MARGIN_Y);
-            blocks.addAll(this.createHorizontalBlockArray(y, calcNUM_VOID(), BONUS_PROBABILITY, BallManager.DEFAULT_BALL_COUNT));
+            blocks.addAll(this.createHorizontalBlockArray(
+                    y,
+                    calcNUM_VOID(),
+                    BONUS_PROBABILITY,
+                    BallManager.DEFAULT_BALL_COUNT));
         }
-        blocks.addAll(createHorizontalHideArray(calcNUM_VOID(), BallManager.DEFAULT_BALL_COUNT));
-        blockDownSpeed = DEFAULT_BLOCK_DOWN_SPEED;
-        delay = 15;
+        // 上部の見えない部分のブロックを生成, フィールド初期化
+        initDown(BallManager.DEFAULT_BALL_COUNT);
         System.out.println("init() BlockManager : num_blocks_count = " + blocks.size());
     }
 
@@ -80,24 +84,21 @@ public class BlockManager
     {
         if (delay > 0) {
             delay--;
-            return gameState;
         }
-        // もしスピードが0未満になったら
-        if (blockDownSpeed < 0) {
+        //もしブロックの高さ分下へ移動したら
+        else if ((int)movedDist >= Block.HEIGHT + MARGIN_Y) {
             // 次のblockDown() に向けて初期化
-            blockDownSpeed = DEFAULT_BLOCK_DOWN_SPEED;
-            delay = 20;
-            //state更新,上部見えないところにブロックを作る
+            initDown(gameState.getBallCount());
+            //gamestate更新
             gameState.state = GameState.State.CLICK_WAIT;
-            blocks.addAll(createHorizontalHideArray(calcNUM_VOID(), gameState.getBallCount()));
-            // gameStateの更新
             gameState.countUpWave();
             gameState.addScore( (gameState.getWaveCount() % 10  == 0) ?
                     300 : (gameState.getWaveCount() % 5 == 0) ?
                     100 : 50);
         }
-        else {  //まだスピードがあるなら
-            for (int i = 0; i < blocks.size(); i++) {
+        else {  //まだスピードがあるならすべてのブロックに対しY座標を更新
+            for (int i = 0; i < blocks.size(); i++)
+            {
                 final Block e = blocks.get(i);
                 e.addY(blockDownSpeed);
                 // 床に触れたらゲームオーバー
@@ -107,10 +108,22 @@ public class BlockManager
                     return gameState;
                 }
             }
+            movedDist += blockDownSpeed; //ブロックの下がった距離に加算
             blockDownSpeed -= VALUE_DOWN_SPEED_SLOW;
+            // もしスピードが0未満になったら
+            if (blockDownSpeed < 0) blockDownSpeed = 0.25;
         }
         return gameState;
     }
+
+    private void initDown(final int ballCount)
+    {
+        blockDownSpeed = DEFAULT_BLOCK_DOWN_SPEED;
+        delay = 15;
+        movedDist = 0;
+        blocks.addAll(createHorizontalHideArray(calcNUM_VOID(), ballCount));
+    }
+
 
     // 空白のブロックの数
     private int calcNUM_VOID()
@@ -121,7 +134,7 @@ public class BlockManager
     // 上部の目に見えないところのブロックを生成
     private List<Block> createHorizontalHideArray(int num_void, int ballCount)
     {
-        return createHorizontalBlockArray(-1*Block.HEIGHT - OFFSET_Y+2, calcNUM_VOID(), BONUS_PROBABILITY, ballCount);
+        return createHorizontalBlockArray(-1 * (Block.HEIGHT + MARGIN_Y) , calcNUM_VOID(), BONUS_PROBABILITY, ballCount);
     }
 
     private List<Block> createHorizontalBlockArray(int y, int num_void, int bonusProbab, int ballCount)

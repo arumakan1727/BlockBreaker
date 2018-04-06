@@ -12,16 +12,16 @@ public class SessionRenderer
 {
     //GameOverの画像についてのhogehoge
     private static final double DEFAULT_OPACITY = 0.2; //フェードインの最初の透明度(0に近いほど透明)
-    private static final double FADE_IN_SPEED = 0.008; //不透明担っていく定数
+    private static final double FADE_IN_SPEED = 0.005; //不透明になっていく定数
     private static final int FIRST_IMG_Y = -80; //フェードインの最初のy座標
     private static final int END_IMG_Y = -55;  //フェードインの最後のy座標
-    private static final double IMG_VY = 0.2;   //フェードインの下へ降りてくる速さ
+    private static final double IMG_VY = 0.14;   //フェードインの下へ降りてくる速さ
     private static final int DELAY = 70;    //フェードインが終わった後の間
     private static final int TEXT_Y = 460;  //"YOUR SCORE"の下のy座標
     //タイトル画面の揺れる文字についてのhogehoge
-    private static final int MIN_TOP_TXET_Y = 455;  //上
+    private static final int MIN_TOP_TXET_Y = 454;  //上
     private static final int MAX_BOTTOM_TEXT_Y = TEXT_Y; //下
-    private static final double VAULE_TEXT_Y_ADD = 0.2; //揺れる速さ
+    private static final double VAULE_TEXT_Y_ADD = 0.14; //揺れる速さ
     private static final String TEXT_MENU = "Click to start";
 
     private double opacity;

@@ -56,6 +56,23 @@ public class RectBounds
         );
     }
 
+    public static EightPointsCollisionState getEightPointsCollisionState(final RectBounds me, final RectBounds target)
+    {
+        final int centerX = (me.ax + me.bx) / 2;
+        final int centerY = (me.ay + me.by) / 2;
+
+        return new EightPointsCollisionState(
+                target.containts(me.ax, me.ay),
+                target.containts(me.bx, me.ay),
+                target.containts(me.ax, me.by),
+                target.containts(me.bx, me.by),
+                target.containts(centerX, me.ay),   //top
+                target.containts(centerX, me.by),   //bottom
+                target.containts(me.ax, centerY),   //left
+                target.containts(me.by, centerY)    //right
+        );
+    }
+
     public static RectBounds.Location whereCollisionAt(RectBounds me, RectBounds target)
     {
         final CornerCollisionState corner
@@ -69,71 +86,6 @@ public class RectBounds
     public enum Location
     {
         NIL, TOP, BOTTOM, LEFT, RIGHT,
-        RIGHT_TOP, RIGHT_BOTTOM, LEFT_TOP, LEFT_BOTTOM;
-    }
-
-    //4すみの衝突状態を保持するクラス
-    public static class CornerCollisionState
-    {
-        public boolean leftTop, rightTop, leftBtm, rightBtm;
-
-        public CornerCollisionState(boolean a, boolean b, boolean c, boolean d)
-        {
-            leftTop     = a;
-            rightTop    = b;
-            leftBtm     = c;
-            rightBtm    = d;
-        }
-
-        public CornerCollisionState()
-        {
-            leftTop = rightTop = leftBtm = rightBtm = false;
-        }
-
-        @Override
-        public String toString()
-        {
-            return ("LT: "+leftTop + " RT: " + rightTop + " LB: "+leftBtm + " RB: "+rightBtm );
-        }
-
-        //引数のフィールドとORをとる
-        public void orAll(CornerCollisionState rhs)
-        {
-            this.leftTop    |= rhs.leftTop;
-            this.rightTop   |= rhs.rightTop;
-            this.leftBtm    |= rhs.leftBtm;
-            this.rightBtm   |= rhs.rightBtm;
-        }
-
-        // 4隅の衝突状態によってどこが衝突しているかを返す
-        public RectBounds.Location whereCollisionAt()
-        {
-            if (leftTop && rightTop) {  // 左上と右上がブロック内
-                return RectBounds.Location.TOP;
-            }
-            else if (leftBtm && rightBtm) {  // 左下と右下がブロック内
-                return RectBounds.Location.BOTTOM;
-            }
-            else if (leftTop && leftBtm) {   // 左上と左下がブロック内
-                return RectBounds.Location.LEFT;
-            }
-            else if (rightTop && rightBtm) { // 右上と右下がブロック内
-                return RectBounds.Location.RIGHT;
-            }
-            else if (leftTop) {  // 左上
-                return RectBounds.Location.LEFT_TOP;
-            }
-            else if (rightTop) { // 右上
-                return RectBounds.Location.RIGHT_TOP;
-            }
-            else if (leftBtm) {  // 左下
-                return RectBounds.Location.LEFT_BOTTOM;
-            }
-            else if (rightBtm) { // 右下
-                return RectBounds.Location.RIGHT_BOTTOM;
-            }
-            else
-                return RectBounds.Location.NIL;
-        }
+        RIGHT_TOP, RIGHT_BOTTOM, LEFT_TOP, LEFT_BOTTOM,
     }
 }

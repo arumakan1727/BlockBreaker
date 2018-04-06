@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 public class Ball extends Sprite
 {
     public static final int SIZE = 16; //ボールの大きさ(縦,横同じサイズ)
-    public static final double SPEED_FLY = 8; //飛ぶ時の速さ
+    public static final double SPEED_FLY = 5; //飛ぶ時の速さ
     public static final double SPEED_ARRANGEMENT = 5;//発射場所へ戻る速さ
 
     private final BufferedImage img;
@@ -96,11 +96,11 @@ public class Ball extends Sprite
             }
             else if (x + SIZE > Game.STATUS_PANEL_X) {
                 vx = -vx;
-                x = Game.STATUS_PANEL_X - SIZE - 1;
+                x = Game.STATUS_PANEL_X - SIZE - 1; //めり込まないように強制的に移動
             }
             if (y < 0) {
                 vy = -vy;
-                y = 1;
+                y = 1; //めり込まないように強制的に移動
             }
 
             //地面についたらフラグを立てる
@@ -113,7 +113,7 @@ public class Ball extends Sprite
 
     public RectBounds getBounds()
     {
-        return (new RectBounds(x, y-1, x+SIZE, y+SIZE+1));
+        return (new RectBounds(x, y, x+SIZE, y+SIZE));
     }
 
     @Override

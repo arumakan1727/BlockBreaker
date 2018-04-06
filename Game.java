@@ -86,6 +86,7 @@ public class Game implements GameProcess
             {
                 GameEngine ge = new GameEngine(renderer, Game.this);
                 ge.setWindowTitle("Block breaker");
+                ge.setFps(80);
                 ge.start();
             }
         });
@@ -151,10 +152,10 @@ public class Game implements GameProcess
         }
 
         //デバック用
-        if (--runChecker < 0) {
-            runChecker = RUNCHECK_INTERVAL;
-            System.out.println("[RUNNING] render()");
-        }
+//        if (--runChecker < 0) {
+//            runChecker = RUNCHECK_INTERVAL;
+//            System.out.println("[RUNNING] render()");
+//        }
     }
 
     private void eventListenInit(Component screen)
