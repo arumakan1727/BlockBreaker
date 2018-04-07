@@ -13,7 +13,7 @@
 * 作者名 -- YDK_NK  
 * ライセンス -- LGPL-2.1  
 * 動作環境 -- Java SE7以降JRE  
-* 最終更新日 -- 2018/3/31  
+* 最終更新日 -- 2018/4/7  
 
 ## 概要
   Javaで動作する,ボールが増えるブロック崩しゲーム。  
@@ -42,7 +42,7 @@
 
 ## 各オブジェクトの説明
 #### ボール
-  ![Ball](../myGame/resources/ball.png)
+  ![Ball](../myGame/resources/ball.png)  
   ボールは最初地面についています。  
   マウスでクリックしたところにボールが飛んでいきます。  
   スペースキーを押すとボールを早送りすることができます。  
@@ -55,7 +55,7 @@
   色に意味はありません。
   
 #### スター
-  ![star](../myGame/resources/bonusPanel.png)
+  ![star](../myGame/resources/bonusPanel.png)  
   星のマーク(スター) を取るとボールが一つ増えます。  
   増えた分は次のターンに反映されます。  
   なお,スターは地面にあたってもGameOverとならないので安心してください。  
@@ -82,8 +82,8 @@
 
 ## お礼
   MP3ファイルの再生にJavaZoom様のJLayerライブラリを使用させていただきました。  
-  音楽素材は「魔王魂」様,「Music-Note.jp」からお借りしています。  
-  画像素材の一部は「写真AC」様, 「GATAG」様からお借りしています。  
+  音楽素材は「魔王魂」様,「Music-Note.jp」様からお借りしています。  
+  画像素材の一部は「写真AC」様, 「GATAG」様, 「CoolText」様からお借りしています。  
   この場を借りて感謝申し上げます。
    * JavaZoom JLayer ----  http://www.javazoom.net/javalayer/javalayer.html
    * 魔王魂          ----  https://maoudamashii.jokersounds.com/ 
@@ -91,6 +91,7 @@
      (Music-Note.jpの運営:株式会社ピクセル - http://pixel-co.com/)  
    * 写真AC          ----  https://www.photo-ac.com/  
    * GATAG フリーイラスト素材集 ---- http://free-illustrations.gatag.net/  
+   * CoolText ----http://ja.cooltext.com http://ja.cooltext.com
 
 ## 既知の不具合
   * スペースキーで早送りするとボールの軌道がずれることがある。  
