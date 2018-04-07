@@ -30,7 +30,7 @@ public class Block extends Sprite
     //当たり判定矩形を返す
     public RectBounds getBounds()
     {
-        return (new RectBounds(x, y-1, x+WIDTH, y+HEIGHT+1));
+        return (new RectBounds(x-1, y-1, x+WIDTH+1, y+HEIGHT+1));
     }
 
     //死んだらtrueを返す

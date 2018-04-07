@@ -91,7 +91,7 @@ public class Game implements GameProcess
         this.sessionRenderer = new SessionRenderer();
 
         // 初期のカーソル
-        this.screen.setCursor(cursor_MY_CROSS);
+        this.screen.setCursor(cursor_DEFAULT);
 
         // マウスやキーのイベントリスナーの設定
         this.eventListenInit(this.screen);
@@ -103,7 +103,7 @@ public class Game implements GameProcess
             {
                 GameEngine ge = new GameEngine(renderer, Game.this);
                 ge.setWindowTitle("Block breaker");
-                ge.setFps(65);
+                ge.setFps(68);
                 ge.start();
             }
         });

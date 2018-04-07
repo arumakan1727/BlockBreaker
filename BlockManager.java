@@ -128,7 +128,7 @@ public class BlockManager
     // 空白のブロックの数
     private int calcNUM_VOID()
     {
-        if (blocks.size() < 5) {
+        if (blocks.size() < 11) {
             return NUM_VOID - 1;
         } else if (new Random().nextInt(10) < 2) {
             return NUM_VOID + 1;
