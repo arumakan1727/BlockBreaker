@@ -8,7 +8,10 @@ import ydk.game.engine.GameProcess;
 import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -23,10 +26,11 @@ public class Game implements GameProcess
     public static final int HEIGHT  = 540;
     public static final int FLOOR_Y = HEIGHT - 30;  //床の座標
     public static final int STATUS_PANEL_X = 520;   //ステータスパネルの座標
+    public static final URL url_menuMP3, url_mainGameMP3, url_explosion, url_coin;
     public static BufferedImage
             img_ball, img_block, img_bonusPanel, img_hexagonBack, img_floor, img_glossPanel,
             img_gameover, img_logo;
-    public static final URL url_menuMP3, url_mainGameMP3, url_explosion, url_coin;
+    private static Cursor cursor_DEFAULT, cursor_MY_CROSS;
     private static final String RESOURCE = "/myGame/resources/";
 
     private final Component     screen;
@@ -52,10 +56,18 @@ public class Game implements GameProcess
             img_glossPanel  = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "gloss-panel.png"));
             img_gameover    = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "gameover.jpg"));
             img_logo        = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "logo.jpeg"));
+
+            // マウスカーソル
+            cursor_MY_CROSS = Toolkit.getDefaultToolkit().createCustomCursor(
+                    ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "cursor.png")),
+                    new Point(10, 10),
+                    "myCrossCursor"
+            );
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(2);
         }
+        cursor_DEFAULT = new Cursor(Cursor.DEFAULT_CURSOR);
         url_menuMP3     = Game.class.getResource(RESOURCE + "dance.MP3");
         url_mainGameMP3 = Game.class.getResource(RESOURCE + "digitalworld.MP3");
         url_explosion   = Game.class.getResource(RESOURCE + "explosion.MP3");
@@ -77,8 +89,12 @@ public class Game implements GameProcess
         this.scoreRenderer = new ScoreRenderer();
         this.sessionRenderer = new SessionRenderer();
 
+        // 初期のカーソル
+        this.screen.setCursor(cursor_MY_CROSS);
+
         // マウスやキーのイベントリスナーの設定
         this.eventListenInit(this.screen);
+        this.screen.requestFocus();
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -158,7 +174,7 @@ public class Game implements GameProcess
 //        }
     }
 
-    private void eventListenInit(Component screen)
+    private void eventListenInit(final Component screen)
     {
         this.screen.addMouseListener(new MouseAdapter()
         {
@@ -222,6 +238,12 @@ public class Game implements GameProcess
                     case KeyEvent.VK_SPACE:
                         gameState.keyPressed_space = false;
                         break;
+                    case KeyEvent.VK_SHIFT: //シフトキーが押されたらマウスカーソルの画像をトグル
+                        if (screen.getCursor().equals(cursor_DEFAULT)) {
+                            screen.setCursor(cursor_MY_CROSS);
+                        } else {
+                            screen.setCursor(cursor_DEFAULT);
+                        }
                 }
             }
         });

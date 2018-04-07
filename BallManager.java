@@ -196,8 +196,6 @@ public class BallManager
                     breakCount += 2;
                 }
                 else {
-                    // ボールの四隅のフラグにORをとる
-//                    corner.orAll(RectBounds.getCornerCollisionState(ballBounds, blockBounds));
                     eightPoints.orAll(RectBounds.getEightPointsCollisionState(ballBounds, blockBounds));
                     if (b.addDamage()) { //もし破壊したら
                         breakCount++;
