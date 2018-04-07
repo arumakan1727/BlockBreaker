@@ -1,18 +1,29 @@
 package myGame;
 
+import ydk.game.sprite.Sprite;
+
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 
 public class ScoreRenderer
 {
     private int ballCount;
     private int waveCount;
     private int score;
+    private List<OneUP> bonusPoses;
+
+    private static final int WIDTH_DIFF = Block.WIDTH - BonusPanel.WIDTH;
 
     private static final BufferedImage img = Game.img_glossPanel;
     private static final int WIDTH = (Game.WIDTH - Game.STATUS_PANEL_X) +10; //ステータスパネルの幅
@@ -23,6 +34,7 @@ public class ScoreRenderer
     private static final int BOTTOM_Y_STRING_SCORE = 290;
 
     public ScoreRenderer() {
+        bonusPoses = new ArrayList<>();
         init();
     }
 
@@ -34,8 +46,28 @@ public class ScoreRenderer
         System.out.println("init() ScoreRenderer");
     }
 
+    public GameState update(final GameState gameState)
+    {
+        Sprite.update(this.bonusPoses);
+
+        final Queue<Point> que = gameState.bonusPos;
+        while (!que.isEmpty())
+        {
+            final Point point = que.poll();
+            this.bonusPoses.add(new OneUP(
+                    Game.img_1up,
+                    point.x - WIDTH_DIFF,
+                    point.y
+                    )
+            );
+        }
+        return gameState;
+    }
+
     public void draw(Graphics2D g2d)
     {
+        Sprite.draw(bonusPoses, g2d);
+
         g2d.drawImage(img, Game.STATUS_PANEL_X, 0, WIDTH, HEIGHT, null);
 
         // 初期の設定を保存し,他のクラスが安全な描画を出来るようにする
@@ -121,4 +153,43 @@ public class ScoreRenderer
         this.score = score;
     }
 
+    private class OneUP extends Sprite
+    {
+        private static final double OPACITY_SUBTRACT_VALUE = 0.03; //1フレーム毎に透明化する値
+        private static final double Y_MOVE_VALUE        = 0.4; //上へ移動させる値(=vy)
+        private final BufferedImage img;
+        private double oparity; //不透明度
+
+        OneUP(final BufferedImage img, double x, double y)
+        {
+            this.img = img;
+            this.x = x;
+            this.y = y;
+            this.oparity = 1;
+        }
+
+
+        @Override
+        public void update(double eta)
+        {
+            this.y -= Y_MOVE_VALUE;
+            this.oparity -= OPACITY_SUBTRACT_VALUE;
+            if (this.oparity <= 0) {
+                this.vanish();
+            }
+        }
+
+        @Override
+        public void draw(Graphics2D g2d)
+        {
+            Composite defaultComposite = g2d.getComposite();
+            AlphaComposite composite
+                    = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)this.oparity);
+
+            g2d.setComposite(composite);
+            g2d.drawImage(img, (int)x, (int)y, null);
+
+            g2d.setComposite(defaultComposite);
+        }
+    }
 }

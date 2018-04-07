@@ -56,7 +56,7 @@ public class BlockManager
             blocks.addAll(this.createHorizontalBlockArray(
                     y,
                     calcNUM_VOID(),
-                    BONUS_PROBABILITY,
+                    BONUS_PROBABILITY + 20,
                     BallManager.DEFAULT_BALL_COUNT));
         }
         // 上部の見えない部分のブロックを生成, フィールド初期化
@@ -128,7 +128,13 @@ public class BlockManager
     // 空白のブロックの数
     private int calcNUM_VOID()
     {
-        return NUM_VOID + ((new Random().nextInt(10) < 2) ? 1 : 0);
+        if (blocks.size() < 5) {
+            return NUM_VOID - 1;
+        } else if (new Random().nextInt(10) < 2) {
+            return NUM_VOID + 1;
+        } else {
+            return NUM_VOID;
+        }
     }
 
     // 上部の目に見えないところのブロックを生成

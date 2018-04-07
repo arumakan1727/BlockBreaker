@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 public class Ball extends Sprite
 {
     public static final int SIZE = 16; //ボールの大きさ(縦,横同じサイズ)
-    public static final double SPEED_FLY = 5; //飛ぶ時の速さ
+    public static final double SPEED_FLY = 6; //飛ぶ時の速さ
     public static final double SPEED_ARRANGEMENT = 5;//発射場所へ戻る速さ
 
     private final BufferedImage img;

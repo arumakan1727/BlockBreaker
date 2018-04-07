@@ -29,7 +29,7 @@ public class Game implements GameProcess
     public static final URL url_menuMP3, url_mainGameMP3, url_explosion, url_coin;
     public static BufferedImage
             img_ball, img_block, img_bonusPanel, img_hexagonBack, img_floor, img_glossPanel,
-            img_gameover, img_logo;
+            img_gameover, img_logo, img_1up;
     private static Cursor cursor_DEFAULT, cursor_MY_CROSS;
     private static final String RESOURCE = "/myGame/resources/";
 
@@ -56,6 +56,7 @@ public class Game implements GameProcess
             img_glossPanel  = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "gloss-panel.png"));
             img_gameover    = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "gameover.jpg"));
             img_logo        = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "logo.jpeg"));
+            img_1up         = ImageIO.read(Game.class.getResourceAsStream(RESOURCE + "1UP.png"));
 
             // マウスカーソル
             cursor_MY_CROSS = Toolkit.getDefaultToolkit().createCustomCursor(
@@ -102,7 +103,7 @@ public class Game implements GameProcess
             {
                 GameEngine ge = new GameEngine(renderer, Game.this);
                 ge.setWindowTitle("Block breaker");
-                ge.setFps(80);
+                ge.setFps(65);
                 ge.start();
             }
         });
@@ -126,6 +127,7 @@ public class Game implements GameProcess
     {
         this.gameState = ballManager.update(this.gameState);
         this.gameState = blockManager.update(this.gameState);
+        this.gameState = scoreRenderer.update(this.gameState);
 
         //スscoreRenderer(テータスパネル描画)のターン数やボール数,スコアを更新
         this.scoreRenderer.setWaveCount(gameState.getWaveCount());

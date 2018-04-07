@@ -27,6 +27,7 @@ public class BallManager
     private boolean anyLanded;  //ボールが1つでも着地したらtrue
     private List<Block> blocks; //当たり判定するblockのリスト
     private int num_newBall;    //ターン終了時にリストに追加するボールの数
+    private Ball visibleBall;
 
     public BallManager(BufferedImage src, List<Block> list)
     {
@@ -46,6 +47,7 @@ public class BallManager
         this.preLaunchPos.y = DEFAULT_START_POS_Y;
         // リストにボールを追加
         addNewBall(DEFAULT_BALL_COUNT);
+        visibleBall = balls.get(0);
         System.out.println("init() BallManager");
     }
 
@@ -56,6 +58,7 @@ public class BallManager
 
     public void draw(Graphics2D g2d)
     {
+        visibleBall.draw(g2d);
         Sprite.draw(balls, g2d);
     }
 
@@ -104,6 +107,7 @@ public class BallManager
             Ball b = balls.get(i);
             b.setDelay(i * 8);
             b.setLanded(false);
+            b.setVisible(true);
             //速度設定
             b.setVx(vx);
             b.setVy(vy);
@@ -133,16 +137,17 @@ public class BallManager
             if (v.isLanded()) //地面についているとき
             {
                 if (!anyLanded) { //まだ誰も着地していない時
+                    anyLanded = true;
+                    visibleBall = v; //地面に最初についたボールをvisibleBallにする
                     preLaunchPos.x = (int)v.getX();
                     preLaunchPos.y = Game.FLOOR_Y - Ball.SIZE;
-                    anyLanded = true;
                 }
                 v.setVy(0);
                 v.setY(preLaunchPos.y);
                 moveToPreLaunchPos(v);
             }
             else {
-                int cnt = colideJudge(v);
+                int cnt = colideJudge(v, gameState);
                 gameState.addScore(cnt * 100);
             }
             allisPreLaunchPos &= v.isPrepareLaunchPos();
@@ -165,6 +170,7 @@ public class BallManager
         if (isPrepareLaunchPosision(v)) {
             v.setVx(0); // 止める
             v.setisPrepareLaunchPos(true);
+            v.setVisible(false);
         } else {
             if ((int)v.getX() < preLaunchPos.x) { //定位置よりも左にある
                 v.setVx(Ball.SPEED_ARRANGEMENT);
@@ -175,7 +181,7 @@ public class BallManager
     }
 
     // 壊したブロックの数を返す
-    private int colideJudge(final Ball v)
+    private int colideJudge(final Ball v, final GameState gameState)
     {
         //壊した数(スター:+2,  ブロック:+1)
         int breakCount = 0;
@@ -194,6 +200,7 @@ public class BallManager
                     num_newBall++;
                     b.vanish();
                     breakCount += 2;
+                    gameState.bonusPos.add(new Point((int)b.getX(), (int)b.getY())); //1UP表示のQueue
                 }
                 else {
                     eightPoints.orAll(RectBounds.getEightPointsCollisionState(ballBounds, blockBounds));

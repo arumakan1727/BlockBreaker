@@ -1,6 +1,8 @@
 package myGame;
 
 import java.awt.Point;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 public class GameState
 {
@@ -19,6 +21,7 @@ public class GameState
     public State state;
     public Point mousePos = new Point(); //クリックされた位置
     public boolean keyPressed_space = false; //スペースキーが押されていればtrue
+    public Queue<Point> bonusPos = new ArrayDeque<>();
 
     private int waveCount; //ターン数
     private int ballCount; //ボールの数
@@ -31,6 +34,7 @@ public class GameState
         this.waveCount = 1;
         this.ballCount = BallManager.DEFAULT_BALL_COUNT;
         this.score = 0;
+        this.bonusPos.clear();
     }
 
     public void countUpWave()
