@@ -1,16 +1,17 @@
 # BlockBreaker
-部活で制作したPC用Javaゲームです。  
-これをビルドするには別途[YDKのゲームエンジン](https://github.com/ydk-nk/SimpleGameFramework) (エンジンと言えるかわからない)と
-[JavaZoom JLayer](http://www.javazoom.net/javalayer/javalayer.html)の  
-2つのライブラリが必要です。  
-  
-**遊ぶだけなら[GoogleDrive - BlockBreaker](https://drive.google.com/drive/folders/1AJAGSFdX3n3XmBeBeH5ZCQFZIw4WAhf1?usp=sharing)
-の方をダウンロードしてください。**
+JavaのSwingで作られたデスクトップ用ゲームです。  
+**メンテナンスされていません。**
+
+ボールが増えるブロック崩しのようなゲームです。
+実装がガバガバでバグがあります。
+ボールがブロックを貫通することがあります。
+
+[ダウンロードはこちらから](https://github.com/arumakan1727/BlockBreaker/releases/tag/v1.1)
 
 ![Screenshot](https://user-images.githubusercontent.com/33191176/38160887-69fb2e30-34ff-11e8-8a68-d6b9a2239be4.png)
 
 * バージョン -- 1.1  
-* 作者名 -- YDK_NK  
+* 作者名 -- Arumakan1727
 * ライセンス -- LGPL-2.1  
 * 動作環境 -- Java SE7以降JRE  
 * 最終更新日 -- 2018/4/07  
@@ -97,5 +98,4 @@
   * スペースキーで早送りするとボールの軌道がずれることがある。  
   * ボールがブロックの角に当たったと判定されて反射が不自然なことがある。  
   * ボールがブロックを貫通することがある。  
-  * まれにGameOver画面でクリックしてもタイトル画面に戻らないことがある。  
 
